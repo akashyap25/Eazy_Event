@@ -26,7 +26,7 @@ function Login() {
     event.preventDefault();
     try {
       const { data } = await axios.post(
-        backend_url + "/login",
+        "http://localhost:3000/login",
         {
           ...values,
         },

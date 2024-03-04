@@ -1,7 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import logo from '../assets/logo.png';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import axios from 'axios';
 import heroImg from "../assets/images/hero.png";
 
 export default function Home() {
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies([]); // Removed setCookie since it's not used
+
+  useEffect(() => {
+    const verifyUser = async () => {
+      if (!cookies.jwt) {
+        navigate("/login");
+        setIsUserLoggedIn(false);
+      } else {
+        try {
+          const { data } = await axios.post(
+            "http://localhost:3000",
+            {},
+            {
+              withCredentials: true,
+            }
+          );
+          if (data.status) {
+            setIsUserLoggedIn(true);
+          } else {
+            removeCookie('jwt');
+            setIsUserLoggedIn(false);
+          }
+        } catch (error) {
+          removeCookie('jwt');
+          setIsUserLoggedIn(false);
+        }
+      }
+    };
+    verifyUser();
+  }, [cookies, navigate, removeCookie]);
+  
+
+
+
+
   return (
     <>
       <section className=" bg-cover bg-center p-10">

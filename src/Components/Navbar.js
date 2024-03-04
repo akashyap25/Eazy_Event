@@ -14,15 +14,17 @@ const Navbar = () => {
     const verifyUser = async () => {
       if (!cookies.jwt) {
         setIsUserLoggedIn(false);
+        return;
       } else {
         try {
           const { data } = await axios.post(
-            backend_url,
-            {},
+            "http://localhost:3000",
+            {}, // You may need to pass any necessary data for verification
             {
               withCredentials: true,
             }
           );
+          console.log("Verification Response:", data); // Log the response
           if (data.status) {
             setIsUserLoggedIn(true);
           } else {
@@ -30,13 +32,15 @@ const Navbar = () => {
             setIsUserLoggedIn(false);
           }
         } catch (error) {
+          console.error("Verification Error:", error); // Log the error
           removeCookie('jwt');
           setIsUserLoggedIn(false);
         }
       }
     };
     verifyUser();
-  }, [cookies, removeCookie]);
+  }, [cookies, removeCookie, setIsUserLoggedIn,]);
+  
   
 
   const logOut = () => {
@@ -115,8 +119,8 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link className='text-slate-800 hover:text-orange-500 transition duration-300' to='/contact'>
-              Contact
+            <Link className='text-slate-800 hover:text-orange-500 transition duration-300' to='/createevent'>
+              Create Event
             </Link>
           </li>
           <li>

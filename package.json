@@ -1,5 +1,5 @@
 {
-  "name": "Eazy-Event",
+  "name": "eazy-event",
   "version": "1.0.0",
   "description": "",
   "source": "public/index.html",
@@ -55,5 +55,7 @@
         "Access-Control-Allow-Origin": "*"
       }
     }
-  }
+  },
+  "main": "jest.config.js",
+  "keywords": []
 }
