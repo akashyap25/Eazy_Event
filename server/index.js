@@ -30,7 +30,6 @@ const connectToDatabase = async () => {
     }
 
     const connection = await mongoose.connect(uri, {
-      useUnifiedTopology: true
     });
 
     cachedDbConnection = connection;
