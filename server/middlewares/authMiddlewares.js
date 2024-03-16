@@ -1,6 +1,5 @@
 const User = require("../models/authModel");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv").config();
 
 module.exports.checkUser = async (req, res, next) => {
     const token = req.cookies.jwt;

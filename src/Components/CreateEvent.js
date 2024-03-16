@@ -3,8 +3,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {MdCloudUpload, MdDelete} from "react-icons/md";
 import {AiFillFileImage} from "react-icons/ai";
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+import axios from "axios";
+
 
 const CreateEvent = () => {
+  const [userId, setUserId] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -12,23 +17,30 @@ const CreateEvent = () => {
     imageURL: "",
     location: "",
     startDate: new Date(),
-    startTime: "",
     endDate: new Date(),
-    endTime: "",
     price: "",
-    url: ""
+    url: "",
+    userId: userId,
   });
 
   const [image, setImage] = useState(null);
   const [fileName, setFileName] = useState('No image selected');
 
+  const [categories, setCategories] = useState([]); //link these to the backend to fetch categories
+  
+  const options = [
+    'one', 'two', 'three'
+  ];
+  const defaultOption = options[0];
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value,} = e.target;
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    
   };
+  
 
   const handleDateChange = (date, name) => {
     setFormData({
@@ -37,10 +49,16 @@ const CreateEvent = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log(formData);
+    // console.log(formData);
+    try {
+      const response = await axios.post("http://localhost:3000/events", formData);
+      console.log(response.data); // Log response from backend
+      // Reset form fields after successful submission if needed
+    } catch (error) {
+      console.error("Error creating event:", error);
+    }
   };
 
   return (
@@ -58,28 +76,13 @@ const CreateEvent = () => {
             value={formData.title}
             onChange={handleChange}
             placeholder="Event title"
-            className="input-field rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"
+            className="rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"
           />
-          <select
-            name="categoryId"
-            value={formData.categoryId}
-            onChange={handleChange}
-            className="input-field rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"
-          >
-            <option value="">Select Category</option>
-            {/* Add your category options here */}
-            <option value="0">Technical</option>
-            <option value="1">Music</option>
-            <option value="2">Sports</option>
-            <option value="3">Food</option>
-            <option value="4">Art</option>
-            <option value="5">Business</option>
-            <option value="6">Fashion</option>
-            <option value="7">Health</option>
-            <option value="8">Science</option>
-            <option value="9">{}</option>
-
-          </select>
+          <div className="flex flex-col md:flex-row w-full gap-5 mb-5">
+              <Dropdown options={options}  value={defaultOption} placeholder="Select an option" className="rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"/>
+          </div>
+          
+          
         </div>
         {/* Description and Image */}
         <div className="flex flex-col md:flex-row gap-5 w-full mb-5">
@@ -92,17 +95,23 @@ const CreateEvent = () => {
           ></textarea>
   <div className="flex flex-col  gap-5 w-full">
   <div className="flex flex-col w-full items-center justify-center h-72 border-2 border-dashed bg-gray-100 rounded-2xl cursor-pointer relative">
-    <input
-      type="file"
-      accept="image/*"
-      className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-      onChange={({ target: { files } }) => {
-        files.length && setFileName(files[0].name);
-        if (files) {
-          setImage(URL.createObjectURL(files[0]));
-        }
-      }}
-    />
+  <input
+  type="file"
+  name="imageURL"
+  accept="*"
+  className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileName(file.name);
+      setImage(URL.createObjectURL(file));
+      setFormData({
+        ...formData,
+        imageURL: file.name, // Use e.target.name to access the input name
+      });
+    }
+  }}
+/>
     {image ? (
       <img src={image} className="w-full h-full object-contain" alt="filename" />
     ) : (
@@ -145,6 +154,7 @@ const CreateEvent = () => {
             <DatePicker
               selected={formData.startDate}
               onChange={(date) => handleDateChange(date, "startDate")}
+              value={formData.startDate}
               showTimeSelect
               timeFormat="HH:mm"
               timeIntervals={15}
@@ -158,6 +168,7 @@ const CreateEvent = () => {
             <DatePicker
               selected={formData.endDate}
               onChange={(date) => handleDateChange(date, "endDate")}
+              value={formData.endDate}
               showTimeSelect
               timeFormat="HH:mm"
               timeIntervals={15}

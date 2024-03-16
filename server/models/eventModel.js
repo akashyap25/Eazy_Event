@@ -13,13 +13,12 @@ const eventSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    required: [true, "Image URL is required"],
   },
-  startDateTime: {
+  startDate: {
     type: Date,
     required: [true, "Start Date/Time is required"],
   },
-  endDateTime: {
+  endDate: {
     type: Date,
     required: [true, "End Date/Time is required"],
   },

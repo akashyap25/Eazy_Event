@@ -8,10 +8,11 @@ const app = express();
 const dotenv = require('dotenv').config();
 const uri = process.env.MONGO_URI;
 const authRoutes = require('./routes/authRoutes');
+const eventRoutes = require('./routes/eventRoutes'); 
 
 app.use(cors({
   origin: 'http://localhost:1234',
-  credentials: true  // Enable CORS with credentials
+  credentials: true
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,8 +30,7 @@ const connectToDatabase = async () => {
       return Promise.resolve(cachedDbConnection);
     }
 
-    const connection = await mongoose.connect(uri, {
-    });
+    const connection = await mongoose.connect(uri, {});
 
     cachedDbConnection = connection;
     console.log('Connected to the database');
@@ -54,3 +54,4 @@ const connectToDatabase = async () => {
 })();
 
 app.use("/", authRoutes);
+app.use("/events", eventRoutes);

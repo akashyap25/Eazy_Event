@@ -49,7 +49,6 @@ export default function Home() {
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-8">
           <div className="md:w-1/2 mb-8 md:mb-0 md:order-2">
             <img 
-              src={heroImg}
               alt="hero"
               className="max-h-60 md:max-h-96 mx-auto"
             />
