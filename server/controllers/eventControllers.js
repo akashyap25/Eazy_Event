@@ -1,12 +1,5 @@
 const Event = require("../models/eventModel");
-const jwt = require("jsonwebtoken");
 
-const maxAge = 3 * 24 * 60 * 60;
-const createToken = (id) => {
-  return jwt.sign({ id }, "Anurags_Secret", {
-    expiresIn: maxAge,
-  });
-};
 
 const handleErrors = (err) => {
   let errors = {
@@ -73,6 +66,16 @@ module.exports.getEvent = async (req, res) => {
     } else {
       res.status(404).json({ message: "Event not found" });
     }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports.getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.status(200).json({ events });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });

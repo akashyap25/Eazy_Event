@@ -13,6 +13,7 @@ import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Login from './Components/Login';
 import Register from './Components/Register';
 import CreateEvent from './Components/CreateEvent';
+import EventDetail from './Components/EventDetail';
 
 
 
@@ -63,6 +64,10 @@ const appRouter = createBrowserRouter([
           {
             path: '/createevent',
             element: <CreateEvent/>
+          },
+          {
+            path: '/event/:eventId',
+            element: <EventDetail/>
           }
         ],
       },
