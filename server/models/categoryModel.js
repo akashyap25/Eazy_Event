@@ -1,9 +1,35 @@
-const { Schema, model, models } = require("mongoose");
+const db = require('../db/db');
 
-const categorySchema = new Schema({
-  name: { type: String, required: true, unique: true },
-});
+class CategorySQL {
+  static async createCategory(categoryName) {
+    try {
+      const result = await db.query(
+        'INSERT INTO categories (name) VALUES (?)',
+        [categoryName]
+      );
+      return result.insertId; // Return the ID of the inserted category
+    } catch (error) {
+      throw new Error(`Error creating category: ${error.message}`);
+    }
+  }
 
-const Category = models.Category || model("Category", categorySchema);
+  static async getCategoryByName(categoryName) {
+    try {
+      const results = await db.query('SELECT * FROM categories WHERE name = ?', [categoryName]);
+      return results;
+    } catch (error) {
+      throw new Error(`Error getting category by name: ${error.message}`);
+    }
+  }
 
-module.exports = Category;
+  static async getAllCategories() {
+    try {
+      const results = await db.query('SELECT * FROM categories');
+      return results;
+    } catch (error) {
+      throw new Error(`Error getting all categories: ${error.message}`);
+    }
+  }
+}
+
+module.exports = CategorySQL;

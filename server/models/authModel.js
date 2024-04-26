@@ -1,58 +1,57 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const db = require('../db/db');
+const bcrypt = require('bcrypt');
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, "Username is Required"],
-    unique: true,
-  },
-  email: {
-    type: String,
-    required: [true, "Email is Required"],
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Password is Required"],
-  },
-  firstName: {
-    type: String,
-    required: [true, "First Name is Required"],
-  },
-  lastName: {
-    type: String,
-    required: [true, "Last Name is Required"],
-  },
-  dob: {
-    type: Date,
-    required: [true, "Date of Birth is Required"],
-  },
-  mobileNumber: {
-    type: String,
-    required: false,
-  },
-});
-
-userSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt();
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
-userSchema.statics.login = async function (identifier, password) {
-  // Check if the identifier is an email or a username
-  const user = await this.findOne({
-    $or: [{ email: identifier }, { username: identifier }],
-  });
-  if (user) {
-    const auth = await bcrypt.compare(password, user.password);
-    if (auth) {
-      return user;
+class UserSQL {
+  static async createUser(user) {
+    try {
+      // Hash the password before storing it in the database
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      
+      const result = await db.query(
+        'INSERT INTO users (username, email, password, firstName, lastName, dob, mobileNumber) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [
+          user.username,
+          user.email,
+          hashedPassword,
+          user.firstName,
+          user.lastName,
+          user.dob,
+          user.mobileNumber
+        ]
+      );
+      return result.insertId; // Return the ID of the inserted user
+    } catch (error) {
+      throw new Error(`Error creating user: ${error.message}`);
     }
-    throw Error("Incorrect password");
   }
-  throw Error("User not found");
-};
 
-module.exports = mongoose.model("Users", userSchema);
+  static async getUserById(id) {
+    try {
+      const [results] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+      return results;
+    } catch (error) {
+      throw new Error(`Error getting user by ID: ${error.message}`);
+    }
+  }
+
+  static async getUserByEmailOrUsername(identifier) {
+    try {
+      const [results] = await db.query('SELECT * FROM users WHERE email = ? OR username = ?', [identifier, identifier]);
+    
+      return results;
+    } catch (error) {
+      throw new Error(`Error getting user by email/username: ${error.message}`);
+    }
+  }
+
+  static async comparePasswords(password, hashedPassword) {
+    try {
+      const match = await bcrypt.compare(password, hashedPassword);
+      return match;
+    } catch (error) {
+      throw new Error(`Error comparing passwords: ${error.message}`);
+    }
+  }
+}
+
+module.exports = UserSQL; 
