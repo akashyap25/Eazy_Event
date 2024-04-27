@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import logo from '../assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import axios from 'axios';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,42 +10,18 @@ const Navbar = () => {
   const [cookies, , removeCookie] = useCookies([]); // Removed setCookie since it's not used
 
   useEffect(() => {
-    const verifyUser = async () => {
-      if (!cookies.jwt) {
-        setIsUserLoggedIn(false);
-        return;
-      } else {
-        try {
-          const { data } = await axios.post(
-            "http://localhost:3000",
-            {}, // You may need to pass any necessary data for verification
-            {
-              withCredentials: true,
-            }
-          );
-          console.log("Verification Response:", data); // Log the response
-          if (data.status) {
-            setIsUserLoggedIn(true);
-          } else {
-            removeCookie('jwt');
-            setIsUserLoggedIn(false);
-          }
-        } catch (error) {
-          console.error("Verification Error:", error); // Log the error
-          removeCookie('jwt');
-          setIsUserLoggedIn(false);
-        }
-      }
-    };
-    verifyUser();
-  }, [cookies, removeCookie, setIsUserLoggedIn,]);
-  
-  
+    const token = cookies.jwt;
+    if (token) {
+      setIsUserLoggedIn(true);
+    } else {
+      setIsUserLoggedIn(false);
+    }
+  }, [cookies]);
 
   const logOut = () => {
     removeCookie('jwt');
     setIsUserLoggedIn(false);
-    navigate('/login');  // Navigate to login page after logout
+    navigate('/login');  
   };
 
   const handleButtonClick = () => {

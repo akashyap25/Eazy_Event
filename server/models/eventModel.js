@@ -61,6 +61,39 @@ class EventSQL {
       throw new Error(`Error getting events by organizer: ${error.message}`);
     }
   }
+
+  static async updateEventById(id, updatedFields) {
+    try {
+      if (Object.keys(updatedFields).length === 0) {
+        throw new Error("No fields to update");
+      }
+      
+      // Build the SET part of the SQL query dynamically
+      let setClause = '';
+      const values = [];
+  
+      for (const field in updatedFields) {
+        setClause += `${field} = ?, `;
+        values.push(updatedFields[field]);
+      }
+      
+      // Remove the trailing comma and space
+      setClause = setClause.slice(0, -2);
+  
+      // Execute the update query
+      const result = await db.query(
+        `UPDATE events SET ${setClause} WHERE id = ?`,
+        [...values, id]
+      );
+  
+      return result.changedRows > 0; // Return true if at least one row was updated
+    } catch (error) {
+      throw new Error(`Error updating event: ${error.message}`);
+    }
+  }
+  
+  
 }
 
 module.exports = EventSQL;
+

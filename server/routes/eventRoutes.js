@@ -1,9 +1,10 @@
-const { createEvent, getEvent, getAllEvents } = require("../controllers/eventControllers");
-const { checkUser } = require("../middlewares/authMiddlewares");
+const { createEvent, getEvent, getAllEvents,updateEvent } = require("../controllers/eventControllers");
+// const { checkUser } = require("../middlewares/authMiddlewares");
 const router = require("express").Router();
 
-router.post("/", checkUser, createEvent); // Requires authentication
-router.get("/", getAllEvents); // No authentication required
-router.get("/:eventId", getEvent); // No authentication required
+router.post("/",createEvent); 
+router.get("/", getAllEvents); 
+router.get("/:eventId", getEvent); 
+router.put("/:eventId", updateEvent);
 
 module.exports = router;

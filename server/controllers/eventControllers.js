@@ -22,6 +22,8 @@ const handleErrors = (err) => {
   return errors;
 };
 
+
+
 module.exports.createEvent = async (req, res) => {
   try {
     const {
@@ -32,8 +34,9 @@ module.exports.createEvent = async (req, res) => {
       startDate,
       endDate,
       price,
-      categoryId, // Assuming categoryId is provided in req.body
-      organizerId, // Assuming organizerId is provided in req.body
+      categoryId, 
+      organizerId, 
+      url,
     } = req.body;
     
     const newEvent = {
@@ -46,6 +49,7 @@ module.exports.createEvent = async (req, res) => {
       price,
       categoryId,
       organizerId,
+      url,
     };
 
     const eventId = await EventSQL.createEvent(newEvent);
@@ -76,6 +80,29 @@ module.exports.getAllEvents = async (req, res) => {
   try {
     const events = await EventSQL.getAllEvents();
     res.status(200).json({ events });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+module.exports.updateEvent = async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const updatedFields = {};
+    if(req.body.imageURL){
+      updatedFields.imageUrl = req.body.imageURL;
+    }
+
+
+
+    const updatedEvent = await EventSQL.updateEventById(eventId, updatedFields);
+    if (updatedEvent) {
+      res.status(200).json({ message: 'Event updated successfully' });
+    } else {
+      res.status(404).json({ message: 'Event not found' });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal Server Error' });

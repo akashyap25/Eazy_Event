@@ -1,63 +1,77 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {MdCloudUpload, MdDelete} from "react-icons/md";
-import {AiFillFileImage} from "react-icons/ai";
-import Dropdown from 'react-dropdown';
-import 'react-dropdown/style.css';
+import { MdCloudUpload, MdDelete } from "react-icons/md";
+import { AiFillFileImage } from "react-icons/ai";
+import Dropdown from "react-dropdown";
+import "react-dropdown/style.css";
 import axios from "axios";
-import Swal from 'sweetalert2';
-import { useCookies } from 'react-cookie';
-
+import Swal from "sweetalert2";
+import { useCookies } from "react-cookie";
+import { v4 as uuidv4 } from "uuid"; // Import UUID for generating unique filenames
 
 const CreateEvent = () => {
-  const [userId, setUserId] = useState("");
+  const [organizerId, setOrganizerId] = useState(2);
+  const [categoryId, setCategoryId] = useState(1);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    categoryId: "",
+    categoryId: categoryId,
     imageURL: "",
     location: "",
-    startDate: new Date(),
-    endDate: new Date(),
+    startDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+    endDate: new Date().toISOString().slice(0, 19).replace("T", " "),
     price: "",
     url: "",
-    userId: userId,
+    organizerId: organizerId,
   });
 
   const [image, setImage] = useState(null);
-  const [fileName, setFileName] = useState('No image selected');
+  const [fileName, setFileName] = useState("No image selected");
 
-  const [categories, setCategories] = useState([]); 
-  const [cookies] = useCookies(['jwt']); 
-  
-  const options = [
-    'one', 'two', 'three'
-  ];
+  const [cookies] = useCookies(["jwt"]);
+
+  const options = ["one", "two", "three"];
   const defaultOption = options[0];
+
   const handleChange = (e) => {
-    const { name, value,} = e.target;
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
-  
 
   const handleDateChange = (date, name) => {
     setFormData({
       ...formData,
-      [name]: date,
+      [name]: date.toISOString().slice(0, 19).replace("T", " "),
     });
+  };
+
+  const handleImageUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "djyk2qku");
+
+    try {
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dmfgwodtn/image/upload",
+        formData
+      );
+      return response.data.secure_url; // Return the URL of the uploaded image
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw new Error("Error uploading image to Cloudinary");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validation checks
     const errors = [];
-    
+  
     // Check if title is empty
     if (!formData.title.trim()) {
       errors.push("Title is required");
@@ -84,7 +98,8 @@ const CreateEvent = () => {
     }
   
     // Check if URL is a valid link
-    const urlPattern = /^((http|https):\/\/)?([A-Za-z0-9-]+\.)+[A-Za-z]{2,6}\/?([A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=%]*)$/;
+    const urlPattern =
+      /^((http|https):\/\/)?([A-Za-z0-9-]+\.)+[A-Za-z]{2,6}\/?([A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=%]*)$/;
     if (!urlPattern.test(formData.url)) {
       errors.push("URL must be a valid link");
     }
@@ -101,13 +116,39 @@ const CreateEvent = () => {
       });
       return;
     }
+  
     try {
-      const token = cookies['jwt'];
+      // Submit formData to your backend
+      const token = cookies["jwt"];
       const response = await axios.post("http://localhost:3000/events", {
-      ...formData,
-      token, 
-    });
+        ...formData,
+        token,
+      });
       
+  
+      // Get the ID of the newly created event from the response
+      const eventId = response.data.event;
+  
+      // Check if an image is selected
+      if (!image) {
+        Swal.fire({
+          icon: "error",
+          title: "Image not selected",
+          text: "Please select an image",
+        });
+        return;
+      }
+  
+      // Upload image to Cloudinary
+      const imageUrl = await handleImageUpload(image);
+  
+      // Update the event with the imageURL in the database
+      await axios.put(`http://localhost:3000/events/${eventId}`, {
+        imageURL: imageUrl,
+        token,
+      });
+  
+      // Display success message
       Swal.fire({
         icon: "success",
         title: "Event Created Successfully",
@@ -126,10 +167,13 @@ const CreateEvent = () => {
   
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full md:w-3/4 lg:w-3/4 mx-auto pt-8 pb-8">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-5 w-full md:w-3/4 lg:w-3/4 mx-auto pt-8 pb-8"
+    >
       {/* Heading */}
       <h1 className="text-3xl font-bold text-center mb-5">Create Event</h1>
-      
+
       {/* Form Fields */}
       <div className="flex flex-col md:flex-row md:flex-wrap gap-5">
         {/* Title and Category */}
@@ -143,10 +187,13 @@ const CreateEvent = () => {
             className="rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"
           />
           <div className="flex flex-col md:flex-row w-full gap-5 mb-5">
-              <Dropdown options={options}  value={defaultOption} placeholder="Select an option" className="rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"/>
+            <Dropdown
+              options={options}
+              value={defaultOption}
+              placeholder="Select an option"
+              className="rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"
+            />
           </div>
-          
-          
         </div>
         {/* Description and Image */}
         <div className="flex flex-col md:flex-row gap-5 w-full mb-5">
@@ -155,50 +202,48 @@ const CreateEvent = () => {
             value={formData.description}
             onChange={handleChange}
             placeholder="Event description"
-            className=" rounded-2xl bg-gray-100 py-2 px-4 mb-4 h-72 w-full"
+            className="rounded-2xl bg-gray-100 py-2 px-4 mb-4 h-72 w-full"
           ></textarea>
-  <div className="flex flex-col  gap-5 w-full">
-  <div className="flex flex-col w-full items-center justify-center h-72 border-2 border-dashed bg-gray-100 rounded-2xl cursor-pointer relative">
-  <input
-  type="file"
-  name="imageURL"
-  accept="*"
-  className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-  onChange={(e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFileName(file.name);
-      setImage(URL.createObjectURL(file));
-      setFormData({
-        ...formData,
-        imageURL: file.name, // Use e.target.name to access the input name
-      });
-    }
-  }}
-/>
-    {image ? (
-      <img src={image} className="w-full h-full object-contain" alt="filename" />
-    ) : (
-      <>
-      <MdCloudUpload color="#1475cf" size={60} />
-      <p className="text-gray-500">Browse Images to upload</p>
-      </>
-    )}
-   
-  </div>
-   <section className="flex flex-row">
-      <AiFillFileImage color="#1475cf" size={30} />
-      <span className="text-gray-500 flex flex-row">{fileName}
-      <MdDelete className="ml-4 mt-1 cursor-pointer"
-        onClick={() => {
-          setImage(null);
-          setFileName('No image selected');
-        }}
-      />
-      </span>
-    </section>
-</div>
-
+          <div className="flex flex-col  gap-5 w-full">
+            <div className="flex flex-col w-full items-center justify-center h-72 border-2 border-dashed bg-gray-100 rounded-2xl cursor-pointer relative">
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setFileName(file.name);
+                    setImage(file);
+                  }
+                }}
+              />
+              {image ? (
+                <img
+                  src={URL.createObjectURL(image)}
+                  className="w-full h-full object-contain"
+                  alt={fileName}
+                />
+              ) : (
+                <>
+                  <MdCloudUpload color="#1475cf" size={60} />
+                  <p className="text-gray-500">Browse Images to upload</p>
+                </>
+              )}
+            </div>
+            <section className="flex flex-row">
+              <AiFillFileImage color="#1475cf" size={30} />
+              <span className="text-gray-500 flex flex-row">{fileName}
+                <MdDelete
+                  className="ml-4 mt-1 cursor-pointer"
+                  onClick={() => {
+                    setImage(null);
+                    setFileName("No image selected");
+                  }}
+                />
+              </span>
+            </section>
+          </div>
         </div>
         {/* Location */}
         <div className="flex flex-col w-full mb-5">
@@ -214,30 +259,28 @@ const CreateEvent = () => {
         {/* Start Date and End Date */}
         <div className="flex flex-col md:flex-row gap-5 w-full mb-5">
           <div className="w-full md:w-1/2">
-          <p className="ml-3 whitespace-nowrap text-gray-600">Start Date:</p>
+            <p className="ml-3 whitespace-nowrap text-gray-600">Start Date:</p>
             <DatePicker
-              selected={formData.startDate}
+              selected={new Date(formData.startDate)}
               onChange={(date) => handleDateChange(date, "startDate")}
-              value={formData.startDate}
               showTimeSelect
               timeFormat="HH:mm"
               timeIntervals={15}
               timeCaption="Time"
-              dateFormat="MMMM d, yyyy h:mm aa"
+              dateFormat="yyyy-MM-dd HH:mm"
               className="input-field rounded-2xl bg-gray-100 py-2 px-4 w-full"
             />
           </div>
           <div className="w-full md:w-1/2">
-          <p className="ml-3 whitespace-nowrap text-gray-600">End Date:</p>
+            <p className="ml-3 whitespace-nowrap text-gray-600">End Date:</p>
             <DatePicker
-              selected={formData.endDate}
+              selected={new Date(formData.endDate)}
               onChange={(date) => handleDateChange(date, "endDate")}
-              value={formData.endDate}
               showTimeSelect
               timeFormat="HH:mm"
               timeIntervals={15}
               timeCaption="Time"
-              dateFormat="MMMM d, yyyy h:mm aa"
+              dateFormat="yyyy-MM-dd HH:mm"
               className="input-field rounded-2xl bg-gray-100 py-2 px-4 w-full"
             />
           </div>
