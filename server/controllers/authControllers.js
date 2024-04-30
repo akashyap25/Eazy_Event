@@ -90,3 +90,13 @@ module.exports.login = async (req, res) => {
     res.json({ errors, status: false });
   }
 };
+
+module.exports.getUserById = async (req, res) => {
+  try {
+    const user = await UserSQL.getUserById(req.params.userId);
+    res.json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}

@@ -77,6 +77,7 @@ module.exports.getEvent = async (req, res) => {
 };
 
 module.exports.getAllEvents = async (req, res) => {
+   console.log('getAllEvents');
   try {
     const events = await EventSQL.getAllEvents();
     res.status(200).json({ events });
@@ -108,3 +109,18 @@ module.exports.updateEvent = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+module.exports.getEventsByOrganizerId = async (req, res) => {
+  const { organizerId } = req.params;
+  try {
+    const events = await EventSQL.getEventsByOrganizer(organizerId);
+    if (events) {
+      res.status(200).json({ events });
+    } else {
+      res.status(404).json({ message: 'Events not found' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+} 

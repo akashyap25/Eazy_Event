@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { MdCloudUpload, MdDelete } from "react-icons/md";
@@ -8,10 +8,10 @@ import "react-dropdown/style.css";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useCookies } from "react-cookie";
-import { v4 as uuidv4 } from "uuid"; // Import UUID for generating unique filenames
+import jwt_decode from "jsonwebtoken/decode";
 
 const CreateEvent = () => {
-  const [organizerId, setOrganizerId] = useState(2);
+  const [organizerId, setOrganizerId] = useState(0);
   const [categoryId, setCategoryId] = useState(1);
   const [formData, setFormData] = useState({
     title: "",
@@ -29,10 +29,36 @@ const CreateEvent = () => {
   const [image, setImage] = useState(null);
   const [fileName, setFileName] = useState("No image selected");
 
+  // organizerId
   const [cookies] = useCookies(["jwt"]);
+  useEffect(() => {
+    if (cookies.jwt) {
+      const decoded = jwt_decode(cookies.jwt);
+      setOrganizerId(decoded.id);
 
-  const options = ["one", "two", "three"];
-  const defaultOption = options[0];
+      setFormData(prevState => ({
+        ...prevState,
+        organizerId: decoded.id
+      }));
+    }
+  }, []);
+
+  // Category
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/categories");
+        setCategories(response.data.categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const options = categories ? categories.map(category => ({ value: category.id, label: category.name })) : [];
+  const defaultOption = "";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,42 +94,42 @@ const CreateEvent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validation checks
     const errors = [];
-  
+
     // Check if title is empty
     if (!formData.title.trim()) {
       errors.push("Title is required");
     }
-  
+
     // Check if description is empty
     if (!formData.description.trim()) {
       errors.push("Description is required");
     }
-  
+
     // Check if location is empty
     if (!formData.location.trim()) {
       errors.push("Location is required");
     }
-  
+
     // Check if start time is before end time
     if (formData.startDate >= formData.endDate) {
       errors.push("End date must be after start date");
     }
-  
+
     // Check if price is a number
     if (isNaN(formData.price)) {
       errors.push("Price must be a number");
     }
-  
+
     // Check if URL is a valid link
     const urlPattern =
       /^((http|https):\/\/)?([A-Za-z0-9-]+\.)+[A-Za-z]{2,6}\/?([A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=%]*)$/;
     if (!urlPattern.test(formData.url)) {
       errors.push("URL must be a valid link");
     }
-  
+
     // Display validation errors if any
     if (errors.length > 0) {
       errors.forEach((error) => {
@@ -116,7 +142,7 @@ const CreateEvent = () => {
       });
       return;
     }
-  
+
     try {
       // Submit formData to your backend
       const token = cookies["jwt"];
@@ -124,11 +150,10 @@ const CreateEvent = () => {
         ...formData,
         token,
       });
-      
-  
+
       // Get the ID of the newly created event from the response
       const eventId = response.data.event;
-  
+
       // Check if an image is selected
       if (!image) {
         Swal.fire({
@@ -138,16 +163,16 @@ const CreateEvent = () => {
         });
         return;
       }
-  
+
       // Upload image to Cloudinary
       const imageUrl = await handleImageUpload(image);
-  
+
       // Update the event with the imageURL in the database
       await axios.put(`http://localhost:3000/events/${eventId}`, {
         imageURL: imageUrl,
         token,
       });
-  
+
       // Display success message
       Swal.fire({
         icon: "success",
@@ -164,7 +189,33 @@ const CreateEvent = () => {
       });
     }
   };
-  
+
+    // Function to add new category
+    const addCategory = async () => {
+      const newCategoryName = prompt("Enter the name of the new category:");
+      if (newCategoryName) {
+        try {
+          // Add the new category to the backend
+          const response = await axios.post("http://localhost:3000/categories", {
+            name: newCategoryName
+          });
+          // Update the categories state
+          setCategories([...categories, response.data.category]);
+          Swal.fire({
+            icon: "success",
+            title: "Category Added",
+            text: "New category has been added successfully!",
+          });
+        } catch (error) {
+          console.error("Error adding category:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to add new category. Please try again.",
+          });
+        }
+      }
+    };
 
   return (
     <form
@@ -190,7 +241,8 @@ const CreateEvent = () => {
             <Dropdown
               options={options}
               value={defaultOption}
-              placeholder="Select an option"
+              placeholder="Select a category"
+              onChange={(option) => setCategoryId(option.value)}
               className="rounded-2xl bg-gray-100 py-2 px-4 mb-4 w-full"
             />
           </div>

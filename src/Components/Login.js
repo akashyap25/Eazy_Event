@@ -2,41 +2,39 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [cookies] = useCookies([]);
   const navigate = useNavigate();
-  
+  const [errorMessage, setErrorMessage] = useState(""); // New state to hold error message
+
   useEffect(() => {
     if (cookies.jwt) {
       navigate("/");
     }
-  }, [cookies, navigate]);
+  }, []);
 
   const [values, setValues] = useState({ identifier: "", password: "" });
-
-  const generateError = (error) =>
-    toast.error(error, {
-      position: "bottom-right",
-    });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
       const { data } = await axios.post(
         "http://localhost:3000/login",
-        {
-          ...values,
-        },
+        { ...values },
         { withCredentials: true }
       );
       if (data) {
-        if (data.error) {
-          generateError(data.error);
+        if (data.status == false) {
+          if(data.errors.username != null || data.errors.email != null){
+            setErrorMessage("Username or password is wrong");
+          }
+          if(data.errors.password != null){
+            setErrorMessage("Username or password is wrong");
+          }
+         
         } else {
-          navigate("/");
+          navigate("/"); 
         }
       }
     } catch (ex) {
@@ -63,7 +61,7 @@ function Login() {
               }
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-4">
             <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
               Password
             </label>
@@ -76,6 +74,9 @@ function Login() {
                 setValues({ ...values, [e.target.name]: e.target.value })
               }
             />
+            {errorMessage && ( // Display error message if exists
+              <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
+            )}
           </div>
           <button
             type="submit"
@@ -91,7 +92,6 @@ function Login() {
           </span>
         </form>
       </div>
-      <ToastContainer />
     </div>
   );
 }

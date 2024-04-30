@@ -6,8 +6,9 @@ import { useCookies } from 'react-cookie';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false); // State to control dropdown visibility
   const navigate = useNavigate();
-  const [cookies, , removeCookie] = useCookies([]); // Removed setCookie since it's not used
+  const [cookies, , removeCookie] = useCookies([]);
 
   useEffect(() => {
     const token = cookies.jwt;
@@ -21,7 +22,7 @@ const Navbar = () => {
   const logOut = () => {
     removeCookie('jwt');
     setIsUserLoggedIn(false);
-    navigate('/login');  
+    navigate('/login');
   };
 
   const handleButtonClick = () => {
@@ -30,6 +31,10 @@ const Navbar = () => {
     } else {
       navigate('/login');
     }
+  };
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
   };
 
   return (
@@ -99,12 +104,43 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <button
-              className='bg-orange-500 hover:bg-orange-700 hover:text-white text-slate-800 ml-20 py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300'
-              onClick={handleButtonClick}
-            >
-              {isUserLoggedIn ? 'Logout' : 'Login'}
-            </button>
+            <div className='relative'>
+              <button
+                className='bg-orange-500 text-slate-800 ml-20 py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300'
+                onClick={toggleDropdown}
+              >
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  className='h-6 w-6'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M4 6h16M4 12h16m-7 6h7'
+                  />
+                </svg>
+              </button>
+              {showDropdown && (
+                <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10'>
+                  <Link to='/profile' className='block px-4 py-2 text-sm text-slate-800 hover:bg-gray-100'>
+                    My Profile
+                  </Link>
+                  <button
+                    onClick={logOut}
+                    className='block w-auto ml-14 text-left px-4 py-2 text-sm text-slate-800 hover:bg-gray-100'
+                  >
+                    Logout
+                  </button>
+                  <Link to='/settings' className='block px-4 py-2 text-sm text-slate-800 hover:bg-gray-100'>
+                    Settings
+                  </Link>
+                </div>
+              )}
+            </div>
           </li>
         </ul>
       </div>

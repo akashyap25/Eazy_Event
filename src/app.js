@@ -14,6 +14,7 @@ import Login from './Components/Login';
 import Register from './Components/Register';
 import CreateEvent from './Components/CreateEvent';
 import EventDetail from './Components/EventDetail';
+import Profile from './Components/Profile';
 
 
 
@@ -68,7 +69,12 @@ const appRouter = createBrowserRouter([
           {
             path: '/event/:eventId',
             element: <EventDetail/>
-          }
+          },
+          {
+            path: '/profile',
+            element: <Profile/>
+          },
+
         ],
       },
     ],

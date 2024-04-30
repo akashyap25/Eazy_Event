@@ -20,7 +20,7 @@ class EventSQL {
           event.organizerId
         ]
       );
-      return result.insertId; // Return the ID of the inserted event
+      return result.insertId; 
     } catch (error) {
       throw new Error(`Error creating event: ${error.message}`);
     }
@@ -36,13 +36,16 @@ class EventSQL {
   }
 
   static async getAllEvents() {
+    console.log('getAllEvents');
     try {
       const results = await db.query('SELECT * FROM events');
+      console.log('results', results);
       return results;
     } catch (error) {
       throw new Error(`Error getting all events: ${error.message}`);
     }
   }
+    
 
   static async getEventsByCategory(categoryId) {
     try {
