@@ -4,7 +4,7 @@ const router = require("express").Router();
 
 // Category routes
 router.post("/", createCategory); 
-router.get("/", getAllCategories); 
+router.get("/all", getAllCategories); 
 router.get("/:categoryId", getCategory); 
 
 

@@ -36,10 +36,8 @@ class EventSQL {
   }
 
   static async getAllEvents() {
-    console.log('getAllEvents');
     try {
       const results = await db.query('SELECT * FROM events');
-      console.log('results', results);
       return results;
     } catch (error) {
       throw new Error(`Error getting all events: ${error.message}`);

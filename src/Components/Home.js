@@ -9,8 +9,7 @@
     useEffect(() => {
       const fetchEvents = async () => {
         try {
-          const response = await axios.get("http://localhost:3000/events");
-          console.log("Events:", response.data);
+          const response = await axios.get("http://localhost:3000/events/all");
 
           setEvents(response.data.events);
         } catch (error) {

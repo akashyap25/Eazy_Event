@@ -77,7 +77,7 @@ module.exports.getEvent = async (req, res) => {
 };
 
 module.exports.getAllEvents = async (req, res) => {
-   console.log('getAllEvents');
+   
   try {
     const events = await EventSQL.getAllEvents();
     res.status(200).json({ events });
