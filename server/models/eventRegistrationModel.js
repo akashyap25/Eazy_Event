@@ -35,14 +35,22 @@ class EventRegistrationSQL {
         }
     }
 
-    static async getEventRegistrationByOrganizerId(userId) {
+    static async getEventRegistrationByUserId(userId) {
         try {
-            const results = await db.query('SELECT * FROM eventRegistrations WHERE  userId = ?', [userId]);
-            return results; // Assuming only one registration per user for an event
+            const query = `
+                SELECT events.* 
+                FROM events 
+                INNER JOIN eventRegistrations 
+                ON events.id = eventRegistrations.eventId 
+                WHERE eventRegistrations.userId = ?;
+            `;
+            const results = await db.query(query, [userId]);
+            return results; 
         } catch (error) {
             throw new Error(`Error getting event registration by ID: ${error.message}`);
         }
     }
+    
 }
 
 

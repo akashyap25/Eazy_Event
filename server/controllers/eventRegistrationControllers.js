@@ -66,10 +66,11 @@ module.exports.getAllEventRegistrations = async (req, res) => {
   }
 };
 
-module.exports.getEventRegistrationByOrganizerId = async (req, res) => {
-  const userId = req.params.organizerId;
+module.exports.getEventRegistrationByUserId = async (req, res) => {
+  const userId = req.params.userId;
   try {
-    const eventRegistration = await EventRegistrationSQL.getEventRegistrationByOrganizerId(userId);
+    const eventRegistration = await EventRegistrationSQL.getEventRegistrationByUserId(userId);
+   
     if (eventRegistration) {
       res.status(200).json({ eventRegistration });
     } else {
