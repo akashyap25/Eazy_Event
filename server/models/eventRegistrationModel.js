@@ -26,9 +26,10 @@ class EventRegistrationSQL {
     }
     
 
-    static async getAllEventRegistrations() {
+    static async getAllEventRegistrations(eventId) {
         try {
-            const results = await db.query('SELECT * FROM eventRegistrations');
+            const results = await db.query('SELECT * FROM eventRegistrations WHERE eventId = ?', [eventId]);
+            
             return results;
         } catch (error) {
             throw new Error(`Error getting all event registrations: ${error.message}`);

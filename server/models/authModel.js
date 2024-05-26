@@ -29,6 +29,7 @@ class UserSQL {
     try {
       const [results] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
       return results;
+
     } catch (error) {
       throw new Error(`Error getting user by ID: ${error.message}`);
     }

@@ -1,6 +1,8 @@
 const db = require('../db/db');
 
 class EventSQL {
+  // Existing methods...
+
   static async createEvent(event) {
     try {
       const result = await db.query(
@@ -43,7 +45,6 @@ class EventSQL {
       throw new Error(`Error getting all events: ${error.message}`);
     }
   }
-    
 
   static async getEventsByCategory(categoryId) {
     try {
@@ -92,9 +93,73 @@ class EventSQL {
       throw new Error(`Error updating event: ${error.message}`);
     }
   }
+
+  // Task Management Methods
+
+  static async createTask(task) {
+    try {
+      const result = await db.query(
+        'INSERT INTO tasks (eventId, userId, title, description) VALUES (?, ?, ?, ?)',
+        [
+          task.eventId,
+          task.userId,
+          task.title,
+          task.description
+        ]
+      );
+      return result.insertId; 
+    } catch (error) {
+      throw new Error(`Error creating task: ${error.message}`);
+    }
+  }
+
+  static async getTasksByEventId(eventId) {
+    try {
+      const results = await db.query('SELECT * FROM tasks WHERE eventId = ?', [eventId]);
+      return results;
+    } catch (error) {
+      throw new Error(`Error getting tasks by event ID: ${error.message}`);
+    }
+  }
+
+  static async updateTaskById(taskId, updatedFields) {
+    try {
+      if (Object.keys(updatedFields).length === 0) {
+        throw new Error("No fields to update");
+      }
+      
+      // Build the SET part of the SQL query dynamically
+      let setClause = '';
+      const values = [];
   
+      for (const field in updatedFields) {
+        setClause += `${field} = ?, `;
+        values.push(updatedFields[field]);
+      }
+      
+      // Remove the trailing comma and space
+      setClause = setClause.slice(0, -2);
   
+      // Execute the update query
+      const result = await db.query(
+        `UPDATE tasks SET ${setClause} WHERE id = ?`,
+        [...values, taskId]
+      );
+  
+      return result.changedRows > 0; // Return true if at least one row was updated
+    } catch (error) {
+      throw new Error(`Error updating task: ${error.message}`);
+    }
+  }
+
+  static async deleteTaskById(taskId) {
+    try {
+      const result = await db.query('DELETE FROM tasks WHERE id = ?', [taskId]);
+      return result.affectedRows > 0; // Return true if a row was deleted
+    } catch (error) {
+      throw new Error(`Error deleting task: ${error.message}`);
+    }
+  }
 }
 
 module.exports = EventSQL;
-

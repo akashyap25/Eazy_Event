@@ -139,7 +139,7 @@ const Profile = () => {
   ) : (
     <p>No events registered by the user.</p>
   )}
-  {registeredEvents.length > 6 && (
+  {registeredEvents?.length > 6 && (
     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded " onClick={() => setShowAllEvents(!showAllEvents)}>
       {showAllEvents ? "Show Less" : "Show All"}
     </button>

@@ -7,7 +7,7 @@ router.post('/',checkEventRegistration, createEventRegistration);
 
 router.get('/:eventId/:userId', getEventRegistration);
 
-router.get('/', getAllEventRegistrations);
+router.get('/:eventId', getAllEventRegistrations);
 
 router.get("/:userId", getEventRegistrationByUserId);
 

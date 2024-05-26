@@ -1,3 +1,4 @@
+const e = require('express');
 const EventRegistrationSQL = require('../models/eventRegistrationModel');
 
 const handleErrors = (err) => {
@@ -57,8 +58,9 @@ module.exports.getEventRegistration = async (req, res) => {
 };
 
 module.exports.getAllEventRegistrations = async (req, res) => {
+  const eventId = req.params.eventId;
   try {
-    const eventRegistrations = await EventRegistrationSQL.getAllEventRegistrations();
+    const eventRegistrations = await EventRegistrationSQL.getAllEventRegistrations(eventId);
     res.status(200).json({ eventRegistrations });
   } catch (err) {
     console.error(err);

@@ -1,10 +1,21 @@
   import React, { useState, useEffect } from 'react';
-  import { Link } from 'react-router-dom';
+  import { Link,useNavigate } from 'react-router-dom';
   import axios from 'axios';
   import heroImg from "../assets/images/hero.png";
+  import { useCookies } from "react-cookie";
 
   export default function Home() {
     const [events, setEvents] = useState([]);
+    const [cookies] = useCookies([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      if (cookies.jwt) {
+        navigate("/");
+      } else {
+        navigate("/login");
+      }
+    }, []);
 
     useEffect(() => {
       const fetchEvents = async () => {
