@@ -129,6 +129,9 @@ const Navbar = () => {
                   <Link to='/profile' className='block px-4 py-2 text-sm text-slate-800 hover:bg-gray-100'>
                     My Profile
                   </Link>
+                  <Link to='/profile' className='block px-4 py-2 text-sm text-slate-800 hover:bg-gray-100'>
+                    Tasks
+                  </Link>
                   <button
                     onClick={logOut}
                     className='block w-auto ml-14 text-left px-4 py-2 text-sm text-slate-800 hover:bg-gray-100'

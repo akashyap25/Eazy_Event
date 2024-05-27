@@ -1,4 +1,5 @@
 const db = require('../db/db');
+const {sendMail} = require('../emailService');
 
 class EventSQL {
   // Existing methods...
@@ -122,6 +123,19 @@ class EventSQL {
     }
   }
 
+  
+
+  static async getTaskById(taskId) {
+    try {
+      const results = await db.query('SELECT * FROM tasks WHERE id = ?', [taskId]);
+      return results;
+    } catch (error) {
+      throw new Error(`Error getting task by ID: ${error.message}`);
+    }
+  };
+
+
+
   static async updateTaskById(taskId, updatedFields) {
     try {
       if (Object.keys(updatedFields).length === 0) {
@@ -147,6 +161,7 @@ class EventSQL {
       );
   
       return result.changedRows > 0; // Return true if at least one row was updated
+
     } catch (error) {
       throw new Error(`Error updating task: ${error.message}`);
     }

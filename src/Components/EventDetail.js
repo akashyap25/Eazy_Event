@@ -24,7 +24,6 @@ const EventDetailPage = () => {
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [percentage, setPercentage] = useState(0);
 
-
   useEffect(() => {
     if (cookies.jwt) {
       const decoded = jwt_decode(cookies.jwt);
@@ -129,6 +128,18 @@ const EventDetailPage = () => {
     }
   }, [event, userId]);
 
+  useEffect(() => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const showNotification = (title, body) => {
+    if (Notification.permission === "granted") {
+      new Notification(title, { body });
+    }
+  };
+
   const handleRegistration = async () => {
     try {
       const response = await axios.post('http://localhost:3000/eventRegistrations', {
@@ -164,7 +175,7 @@ const EventDetailPage = () => {
 
   const handleAssignTask = async (taskId, userId) => {
     try {
-      await axios.put(`http://localhost:3000/tasks/${taskId}`, { userId }, {
+      await axios.put(`http://localhost:3000/events/tasks/${taskId}`, { userId }, {
         headers: {
           'Authorization': `Bearer ${cookies.jwt}` // Assuming jwt is the cookie containing the token
         }
@@ -172,6 +183,12 @@ const EventDetailPage = () => {
       // Update the task list after assigning the task
       const updatedTasks = tasks.map(task => task.id === taskId ? { ...task, userId } : task);
       setTasks(updatedTasks);
+
+      // Show notification
+      const assignedUser = userDetails.find(user => user.id === userId);
+      if (assignedUser) {
+        showNotification('Task Assigned', `You have been assigned a task "${selectedTask.title}".`);
+      }
     } catch (error) {
       console.error('Error assigning task:', error);
     }
@@ -212,8 +229,6 @@ const EventDetailPage = () => {
   setPercentage(parseFloat(roundedPercentage));
   }, [tasks]);
 
-
-  
   return (
     <div className="bg-gray-100 min-h-screen flex items-center justify-center">
       <div className="container mx-auto p-8 bg-white rounded-lg shadow-lg flex flex-wrap">
@@ -254,11 +269,11 @@ const EventDetailPage = () => {
                   <div className="mt-8">
                     <h3 className="text-2xl font-bold mb-4">Tasks</h3>
                     <div className="mb-4">
-    <div className="bg-gray-200 w-full h-2 rounded-full">
-      <div className="bg-green-500 h-2 rounded-full" style={{ width: `${percentage}%` }}></div>
-    </div>
-    <p className="text-sm mt-1">{`${percentage}% Completed`}</p>
-  </div>
+                      <div className="bg-gray-200 w-full h-2 rounded-full">
+                        <div className="bg-green-500 h-2 rounded-full" style={{ width: `${percentage}%` }}></div>
+                      </div>
+                      <p className="text-sm mt-1">{`${percentage}% Completed`}</p>
+                    </div>
                     <ul className="list-disc pl-5">
                       {tasks.map(task => (
                         <li key={task.id} className={`mb-2 ${task.userId ? 'text-green-500' : 'text-red-500'}`}>

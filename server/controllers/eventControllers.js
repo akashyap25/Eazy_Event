@@ -1,4 +1,6 @@
 const EventSQL = require('../models/eventModel');
+const AuthSQL = require('../models/authModel');
+const { sendMail } = require('../emailService');
 
 const handleErrors = (err) => {
   let errors = {
@@ -163,7 +165,21 @@ module.exports.updateTask = async (req, res) => {
     const updatedFields = req.body;
 
     const updatedTask = await EventSQL.updateTaskById(taskId, updatedFields);
-    if (updatedTask) {
+    if (updatedTask && userId in updatedFields) {
+      // Fetch the user's email based on userId from the updated task details
+      const taskDetails = await EventSQL.getTaskById(taskId);
+      const user = await AuthSQL.getUserById(taskDetails.userId);
+      const event = await EventSQL.getEventById(taskDetails.eventId);
+
+      // Send an email notification to the user
+      sendMail(
+        user.email,
+        'Task Assigned',
+        `You have been assigned a task "${taskDetails.title}" for the event "${event.title}".
+        Please login to your account to view the task details.
+        `
+      );
+
       res.status(200).json({ message: 'Task updated successfully' });
     } else {
       res.status(404).json({ message: 'Task not found' });
