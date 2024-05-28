@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import jwt_decode from 'jsonwebtoken/decode';
 import Modal from 'react-modal';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const EventDetailPage = () => {
   const [event, setEvent] = useState(null);
@@ -23,6 +25,7 @@ const EventDetailPage = () => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [percentage, setPercentage] = useState(0);
+  const HOST = process.env.HOST;
 
   useEffect(() => {
     if (cookies.jwt) {
@@ -34,7 +37,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/events/${eventId}`);
+        const response = await axios.get(`${HOST}/events/${eventId}`);
         setEvent(response.data.event[0]);
       } catch (error) {
         console.error('Error fetching event details:', error);
@@ -47,7 +50,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const fetchCategoryDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/categories/${event.categoryId}`);
+        const response = await axios.get(`${HOST}/categories/${event.categoryId}`);
         setCategory(response.data.category[0].name);
       } catch (error) {
         console.error('Error fetching category details:', error);
@@ -61,7 +64,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const checkRegistrationStatus = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/eventRegistrations/${eventId}/${userId}`);
+        const response = await axios.get(`${HOST}/eventRegistrations/${eventId}/${userId}`);
         if (response.data != null) {
           setRegistrationStatus(true);
         }
@@ -78,7 +81,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const fetchRegisteredUsers = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/eventRegistrations/${eventId}`);
+        const response = await axios.get(`${HOST}/eventRegistrations/${eventId}`);
         setRegisteredUsers(response.data.eventRegistrations);
       } catch (error) {
         console.error('Error fetching registered users:', error);
@@ -90,7 +93,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const userDetailsPromises = registeredUsers.map(user => axios.get(`http://localhost:3000/${user.userId}`));
+        const userDetailsPromises = registeredUsers.map(user => axios.get(`${HOST}/${user.userId}`));
 
         const userDetailsResponses = await Promise.all(userDetailsPromises);
         const userDetails = userDetailsResponses.map(response => response.data.user);
@@ -108,7 +111,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/events/${eventId}/tasks`);
+        const response = await axios.get(`${HOST}/events/${eventId}/tasks`);
         setTasks(response.data.tasks);
       } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -142,7 +145,7 @@ const EventDetailPage = () => {
 
   const handleRegistration = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/eventRegistrations', {
+      const response = await axios.post(`${HOST}/eventRegistrations`, {
         eventId: eventId,
         userId: userId,
         transactionId: transactionId,
@@ -175,7 +178,7 @@ const EventDetailPage = () => {
 
   const handleAssignTask = async (taskId, userId) => {
     try {
-      await axios.put(`http://localhost:3000/events/tasks/${taskId}`, { userId }, {
+      await axios.put(`${HOST}/events/tasks/${taskId}`, { userId }, {
         headers: {
           'Authorization': `Bearer ${cookies.jwt}` // Assuming jwt is the cookie containing the token
         }
@@ -196,7 +199,7 @@ const EventDetailPage = () => {
 
   const handleAddNewTask = async () => {
     try {
-      const response = await axios.post(`http://localhost:3000/events/tasks`, {
+      const response = await axios.post(`${HOST}/events/tasks`, {
         title: newTaskTitle,
         description: newTaskDescription,
         userId: null,

@@ -9,6 +9,9 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useCookies } from "react-cookie";
 import jwt_decode from "jsonwebtoken/decode";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const CreateEvent = () => {
   const [organizerId, setOrganizerId] = useState(0);
@@ -28,6 +31,7 @@ const CreateEvent = () => {
 
   const [image, setImage] = useState(null);
   const [fileName, setFileName] = useState("No image selected");
+  const HOST = process.env.HOST;
 
   // organizerId
   const [cookies] = useCookies(["jwt"]);
@@ -48,7 +52,7 @@ const CreateEvent = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/categories/all");
+        const response = await axios.get(`${HOST}/categories/all`);
         setCategories(response.data.categories);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -146,7 +150,7 @@ const CreateEvent = () => {
     try {
       // Submit formData to your backend
       const token = cookies["jwt"];
-      const response = await axios.post("http://localhost:3000/events", {
+      const response = await axios.post(`${HOST}/events`, {
         ...formData,
         token,
       });
@@ -168,7 +172,7 @@ const CreateEvent = () => {
       const imageUrl = await handleImageUpload(image);
 
       // Update the event with the imageURL in the database
-      await axios.put(`http://localhost:3000/events/${eventId}`, {
+      await axios.put(`${HOST}/events/${eventId}`, {
         imageURL: imageUrl,
         token,
       });
@@ -196,7 +200,7 @@ const CreateEvent = () => {
       if (newCategoryName) {
         try {
           // Add the new category to the backend
-          const response = await axios.post("http://localhost:3000/categories", {
+          const response = await axios.post(`${HOST}/categories`, {
             name: newCategoryName
           });
           // Update the categories state

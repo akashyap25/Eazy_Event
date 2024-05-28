@@ -20,7 +20,7 @@ function Login() {
     event.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:3000/login",
+        `${HOST}/login`,
         { ...values },
         { withCredentials: true }
       );

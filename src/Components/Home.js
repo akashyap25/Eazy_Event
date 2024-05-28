@@ -3,11 +3,14 @@
   import axios from 'axios';
   import heroImg from "../assets/images/hero.png";
   import { useCookies } from "react-cookie";
+  import dotenv from "dotenv";
+  dotenv.config();
 
   export default function Home() {
     const [events, setEvents] = useState([]);
     const [cookies] = useCookies([]);
     const navigate = useNavigate();
+    const HOST = process.env.HOST;
 
     useEffect(() => {
       if (cookies.jwt) {
@@ -20,7 +23,7 @@
     useEffect(() => {
       const fetchEvents = async () => {
         try {
-          const response = await axios.get("http://localhost:3000/events/all");
+          const response = await axios.get(`${HOST}/events/all`);
 
           setEvents(response.data.events);
         } catch (error) {

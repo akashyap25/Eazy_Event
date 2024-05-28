@@ -1,8 +1,7 @@
 const db = require('../db/db');
-const {sendMail} = require('../emailService');
+const { sendMail } = require('../emailService');
 
 class EventSQL {
-  // Existing methods...
 
   static async createEvent(event) {
     try {
@@ -95,7 +94,10 @@ class EventSQL {
     }
   }
 
-  // Task Management Methods
+
+
+
+  // Task Management Methods   //
 
   static async createTask(task) {
     try {
@@ -123,8 +125,6 @@ class EventSQL {
     }
   }
 
-  
-
   static async getTaskById(taskId) {
     try {
       const results = await db.query('SELECT * FROM tasks WHERE id = ?', [taskId]);
@@ -133,8 +133,6 @@ class EventSQL {
       throw new Error(`Error getting task by ID: ${error.message}`);
     }
   };
-
-
 
   static async updateTaskById(taskId, updatedFields) {
     try {
@@ -173,6 +171,27 @@ class EventSQL {
       return result.affectedRows > 0; // Return true if a row was deleted
     } catch (error) {
       throw new Error(`Error deleting task: ${error.message}`);
+    }
+  }
+
+  static async getTasksByUserId(userId) {
+    try {
+      const query = `
+        SELECT 
+          tasks.*, 
+          events.title AS eventTitle, 
+          events.description AS eventDescription, 
+          events.location AS eventLocation, 
+          events.startDate AS eventStartDate, 
+          events.endDate AS eventEndDate
+        FROM tasks
+        JOIN events ON tasks.eventId = events.id
+        WHERE tasks.userId = ?;
+      `;
+      const results = await db.query(query, [userId]);
+      return results;
+    } catch (error) {
+      throw new Error(`Error getting tasks by user ID: ${error.message}`);
     }
   }
 }

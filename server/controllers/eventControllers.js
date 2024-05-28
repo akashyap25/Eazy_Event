@@ -204,3 +204,19 @@ module.exports.deleteTask = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+module.exports.getTasksByUserId = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const tasks = await EventSQL.getTasksByUserId(userId);
+    if (tasks.length > 0) {
+      res.status(200).json({ tasks });
+    } else {
+      res.status(404).json({ message: 'No tasks found for this user' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+

@@ -3,10 +3,14 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
+import dotenv from "dotenv";
+dotenv.config();
 
 function Register() {
   const [cookies] = useCookies(["cookie-name"]);
   const navigate = useNavigate();
+  const HOST = process.env.HOST;
+  
   useEffect(() => {
     if (cookies.jwt) {
       navigate("/");
@@ -14,6 +18,7 @@ function Register() {
   }, [cookies, navigate]);
 
   const [values, setValues] = useState({ username: "", email: "", password: "", firstName: "", lastName: "", dob: "", mobileNumber: "" });
+  
   const generateError = (error) =>
     toast.error(error, {
       position: "bottom-right",
@@ -23,7 +28,7 @@ function Register() {
     event.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:3000/register",
+        `${HOST}/register`,
         {
           ...values,
         },
@@ -52,7 +57,7 @@ function Register() {
     <div className="container mx-auto h-screen flex justify-center items-center">
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" style={{ width: "700px" }}>
         <h2 className="text-2xl mb-6 text-center">Register Account</h2>
-        <form onSubmit={(e) => handleSubmit(e)} className="flex flex-wrap justify-between">
+        <form onSubmit={handleSubmit} className="flex flex-wrap justify-between">
           <div className="flex flex-col mb-4 w-1/2 pr-2">
             <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
               Username
