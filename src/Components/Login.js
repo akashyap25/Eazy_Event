@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 function Login() {
   const [cookies] = useCookies([]);
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState(""); // New state to hold error message
+  const [errorMessage, setErrorMessage] = useState(""); 
+  const HOST = process.env.HOST;
 
   useEffect(() => {
     if (cookies.jwt) {
