@@ -31,7 +31,7 @@ const CreateEvent = () => {
 
   const [image, setImage] = useState(null);
   const [fileName, setFileName] = useState("No image selected");
-  const HOST = process.env.HOST;
+  const HOST = process.env.REACT_APP_HOST;
 
   // organizerId
   const [cookies] = useCookies(["jwt"]);

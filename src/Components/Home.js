@@ -10,7 +10,7 @@
     const [events, setEvents] = useState([]);
     const [cookies] = useCookies([]);
     const navigate = useNavigate();
-    const HOST = process.env.HOST;
+    const HOST = process.env.REACT_APP_HOST;
 
     useEffect(() => {
       if (cookies.jwt) {

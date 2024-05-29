@@ -10,7 +10,7 @@ function Login() {
   const [cookies] = useCookies([]);
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState(""); 
-  const HOST = process.env.HOST;
+  const HOST = process.env.REACT_APP_HOST;
 
   useEffect(() => {
     if (cookies.jwt) {

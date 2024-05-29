@@ -25,7 +25,7 @@ const EventDetailPage = () => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [percentage, setPercentage] = useState(0);
-  const HOST = process.env.HOST;
+  const HOST = process.env.REACT_APP_HOST;
 
   useEffect(() => {
     if (cookies.jwt) {

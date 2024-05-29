@@ -16,7 +16,7 @@ const Profile = () => {
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [assignedTasks, setAssignedTasks] = useState([]);
   const navigate = useNavigate();
-  const HOST = process.env.HOST;
+  const HOST = process.env.REACT_APP_HOST;
 
   useEffect(() => {
     if (cookies.jwt) {

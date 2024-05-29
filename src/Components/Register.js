@@ -9,7 +9,7 @@ dotenv.config();
 function Register() {
   const [cookies] = useCookies(["cookie-name"]);
   const navigate = useNavigate();
-  const HOST = process.env.HOST;
+  const HOST = process.env.REACT_APP_HOST;
   
   useEffect(() => {
     if (cookies.jwt) {
