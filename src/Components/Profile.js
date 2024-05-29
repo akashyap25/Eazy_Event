@@ -31,7 +31,7 @@ const Profile = () => {
         const response = await axios.get(`${HOST}/${userId}`);
         setUserProfile(response.data.user);
       } catch (error) {
-        console.error('Error fetching user profile:', new Error(error));
+        console.error('Error fetching user profile:', error);
       }
     };
 
@@ -47,7 +47,7 @@ const Profile = () => {
         const reversedEvents = response.data.events.reverse();
         setCreatedEvents(reversedEvents);
       } catch (error) {
-        console.error('Error fetching created events:', new Error(error));
+        console.error('Error fetching created events:', error);
       }
     };
 
@@ -62,7 +62,7 @@ const Profile = () => {
         const response = await axios.get(`${HOST}/eventRegistrations/${userId}`);
         setRegisteredEvents(response.data.eventRegistration);
       } catch (error) {
-        console.error('Error fetching registered events:', new Error(error));
+        console.error('Error fetching registered events:', error);
       }
     };
 
@@ -77,7 +77,7 @@ const Profile = () => {
         const response = await axios.get(`${HOST}/events/tasks/${userId}`);
         setAssignedTasks(response.data.tasks);
       } catch (error) {
-        console.error('Error fetching assigned tasks:', new Error(error));
+        console.error('Error fetching assigned tasks:', error);
       }
     };
 
