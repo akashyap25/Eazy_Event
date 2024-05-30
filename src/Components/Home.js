@@ -12,13 +12,16 @@ export default function Home() {
   const navigate = useNavigate();
   const HOST = process.env.REACT_APP_HOST;
 
+  console.log(cookies);
+
   useEffect(() => {
     if (cookies.jwt) {
+      console.log(cookies.jwt);
       navigate("/");
     } else {
       navigate("/login");
     }
-  }, [cookies, navigate]); // Added dependencies here
+  }, []); 
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -29,10 +32,11 @@ export default function Home() {
         if (response.data && response.data.events) {
           setEvents(response.data.events);
         } else {
-          console.error('Unexpected response structure:', response.data);
+          console.log(response.status)
         }
       } catch (error) {
-        console.error("Error fetching events:", error.message);
+        console.log(error);
+      
       }
     };
     if (HOST) {
