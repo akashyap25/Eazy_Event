@@ -4,7 +4,7 @@
 
 Welcome to **Eazy Event**, a full-stack application built with React, Node.js, Express, and MySQL. This application allows users to register, login, create and manage events, and register for events. It also includes a task management system for events.
 
-![Project Logo](https://drive.google.com/file/d/1hq-BR692LiwHluBbYRdjL4rNSEGvA4kk/view?usp=sharing)
+![Project Logo](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/logo.png)
 
 ## Table of Contents
 
@@ -122,23 +122,23 @@ Before you begin, ensure you have met the following requirements:
 ## Screenshots
 
 ### Home page
-![Home Page](https://drive.google.com/file/d/1AheU7_Hpg_7IYi2AI-ycJySScDgvSz3Z/view?usp=sharing)
-![Home Page](https://drive.google.com/file/d/1hZutI2AjiutHxVJuAmhOuA3rQ0n_N4np/view?usp=sharing)
+![Home Page](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/Home.png)
+![Home Page](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/Events.png)
 
 ### Registration Page
-![Registration Page](https://drive.google.com/file/d/1WteBfwpHMXAdyHx3JqNgVlHC8AgIIQ6y/view?usp=drive_link)
+![Registration Page](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/register.png)
 
 ### Login Page
-![Login Page](https://drive.google.com/file/d/1_p6ChU4iYmgQJt7RwTPd8kE-x_7yxE7J/view?usp=sharing)
+![Login Page](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/login.png)
 
 ### Event Management
-![Event Management](https://drive.google.com/file/d/1DA0k_ZtStlToqs0LSvAlVPdoDfwWgsc4/view?usp=sharing)
+![Event Management](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/Eventpage.png)
 
 ### Event Registration
-![Event Registration](https://drive.google.com/file/d/1DO74rRIp--OXbXr5n-YfHcHaUx5-yv_k/view?usp=sharing)
+![Event Registration](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/create-event.png)
 
 ### Task Management
-![Task Management](https://drive.google.com/file/d/1kd4Dl66apz4vY1DU8xi4tcTfR3Iua7gR/view?usp=sharing)
+![Task Management](https://github.com/akashyap25/Eazy_Event/blob/main/src/assets/github_images/task.png)
 
 ## Contributing
 
