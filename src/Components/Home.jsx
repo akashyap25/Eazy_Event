@@ -3,18 +3,16 @@ import axios from 'axios';
 import heroImg from "../assets/images/hero.png";
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
-import { orange } from '@mui/material/colors';
 import EventCard from './Events/EventCard';
 
 export default function Home() {
 
   const [events, setEvents] = useState([]);
 
-  const ColorButton = styled(Button)(({ theme }) => ({
-    color: theme.palette.getContrastText(orange[500]),
-    backgroundColor: orange[500],
+  const ColorButton = styled(Button)(() => ({
+    backgroundColor: '#705CF7',
     '&:hover': {
-      backgroundColor: orange[700],
+      backgroundColor: '#5c49D9',
     },
   }));
 

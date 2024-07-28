@@ -17,11 +17,10 @@ import UploadFileIcon from '../../assets/icons/file-upload.svg';
 import calendaricon from "../../assets/icons/calendar.svg";
 import dollar from "../../assets/icons/dollar.svg";
 
-const ColorButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.getContrastText(orange[500]),
-  backgroundColor: orange[500],
+const ColorButton = styled(Button)(() => ({
+  backgroundColor: '#705CF7',
   '&:hover': {
-    backgroundColor: orange[700],
+    backgroundColor: '#5c49D9',
   },
 }));
 

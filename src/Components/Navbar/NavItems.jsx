@@ -1,15 +1,34 @@
-import React from 'react';
+import {useEffect, useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
+import getUser from '../../Utils/GetUser';
 
 const headerLinks = [
   { label: 'Home', route: '/' },
-  { label: 'Create Event', route: '/create-event' },
-  { label: 'About', route: '/about' }
+  { label: 'Create Event', route: '/events/create' },
+  { label: 'Profile', route: '/profile/user._id' }
 ];
 
 const NavItems = () => {
   const location = useLocation();
   const pathname = location.pathname;
+  const { userId } = useAuth();
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        if(!userId) return;
+        const fetchedUser = await getUser(userId);
+        setUser(fetchedUser);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
 
   return (
     <ul className="md:flex-between flex w-full flex-col items-start gap-5 md:flex-row">
