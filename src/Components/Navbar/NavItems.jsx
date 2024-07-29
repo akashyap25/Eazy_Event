@@ -1,13 +1,7 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import getUser from '../../Utils/GetUser';
-
-const headerLinks = [
-  { label: 'Home', route: '/' },
-  { label: 'Create Event', route: '/events/create' },
-  { label: 'Profile', route: '/profile/user._id' }
-];
 
 const NavItems = () => {
   const location = useLocation();
@@ -18,7 +12,7 @@ const NavItems = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        if(!userId) return;
+        if (!userId) return;
         const fetchedUser = await getUser(userId);
         setUser(fetchedUser);
       } catch (error) {
@@ -29,6 +23,11 @@ const NavItems = () => {
     fetchUser();
   }, [userId]);
 
+  const headerLinks = [
+    { label: 'Home', route: '/' },
+    { label: 'Create Event', route: '/events/create' },
+    { label: 'Profile', route: `/profile/${user._id}` }
+  ];
 
   return (
     <ul className="md:flex-between flex w-full flex-col items-start gap-5 md:flex-row">

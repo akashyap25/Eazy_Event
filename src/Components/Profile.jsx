@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button, Box, Typography, Grid, Pagination, Card, CardContent } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@clerk/clerk-react';
-import getUser from '../Utils/GetUser';
+import { Button, Box, Typography, Grid, Pagination } from '@mui/material';
+import { Link, useParams } from 'react-router-dom';
 import EventCard from './Events/EventCard';
 
 const ProfilePage = () => {
-  const { userId } = useAuth();
-  const [user, setUser] = useState({});
+  const userId = useParams().id;
+ 
 
   const [orders, setOrders] = useState([]);
   const [orderedEvents, setOrderedEvents] = useState([]);
@@ -18,10 +16,14 @@ const ProfilePage = () => {
   const [ordersTotalPages, setOrdersTotalPages] = useState(1);
   const [eventsTotalPages, setEventsTotalPages] = useState(1);
 
+
+
+ 
+
   useEffect(() => {
     // const fetchOrders = async () => {
     //   try {
-    //     const response = await axios.get(`http://localhost:5000/api/orders/user/${user._id}`);
+    //     const response = await axios.get(`http://localhost:5000/api/orders/user/${userId}`);
     //     setOrders(response.data.data);
     //     setOrderedEvents(response.data.data.map((order) => order.event));
     //     setOrdersTotalPages(response.data.totalPages);
@@ -32,43 +34,34 @@ const ProfilePage = () => {
 
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/events/user/${user._id}`);
+        const response = await axios.get(`http://localhost:5000/api/events/user/${userId}`);
         setOrganizedEvents(response.data);
         setEventsTotalPages(response.data.totalPages);
+        console.log()
       } catch (error) {
         console.error('Error fetching events:', error);
       }
     };
 
-    if (user?._id) {
-    //   fetchOrders();
+    if (userId) {
       fetchEvents();
     }
-  }, [user?._id, ordersPage, eventsPage]);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        if(!userId) return;
-        const fetchedUser = await getUser(userId);
-        setUser(fetchedUser);
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    };
-
-    fetchUser();
-  }, [userId]);
+  }, [userId, ordersPage, eventsPage]);
 
   return (
     <>
       {/* My Tickets */}
-      <Box sx={{  py: 5, px:12 }}>
+      <Box sx={{ py: 5, px: 12 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mx: 3 }}>
-          <Typography variant="h3" component="h3" >
+          <Typography variant="h3" component="h3">
             My Tickets
           </Typography>
-          <Button variant="contained" component={Link} to="/#events" sx={{bgcolor:'#705CF7',"&:hover": {bgcolor:'#5c49D9'}, borderRadius:'99999px'}}>
+          <Button
+            variant="contained"
+            component={Link}
+            to="/#events"
+            sx={{ bgcolor: '#705CF7', '&:hover': { bgcolor: '#5c49D9' }, borderRadius: '99999px' }}
+          >
             Explore More Events
           </Button>
         </Box>
@@ -98,12 +91,17 @@ const ProfilePage = () => {
       </Box>
 
       {/* Events Organized */}
-      <Box sx={{  py: 5, px:12 }}>
+      <Box sx={{ py: 5, px: 12 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mx: 3 }}>
           <Typography variant="h3" component="h3">
             Events Organized
           </Typography>
-          <Button variant="contained" component={Link} to="/events/create" sx={{bgcolor:'#705CF7', "&:hover": {bgcolor:'#5c49D9'}, borderRadius:'99999px'}}>
+          <Button
+            variant="contained"
+            component={Link}
+            to="/events/create"
+            sx={{ bgcolor: '#705CF7', '&:hover': { bgcolor: '#5c49D9' }, borderRadius: '99999px' }}
+          >
             Create New Event
           </Button>
         </Box>
