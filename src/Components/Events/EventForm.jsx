@@ -100,6 +100,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
             borderRadius: "20px",
             backgroundColor: "#f0f0f0",
             width: "100%",
+            height: '265px',
           }}
         >
           {imagePreview ? (

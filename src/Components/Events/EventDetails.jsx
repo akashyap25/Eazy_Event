@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, Grid, Paper, Avatar, Chip } from '@mui/material';
@@ -33,9 +33,8 @@ const EventDetails = () => {
     fetchEventDetails();
   }, [id]);
 
-   // Filter out the current event from related events
-   const filteredRelatedEvents = relatedEvents.filter(relatedEvent => relatedEvent._id !== event._id);
-   
+  // Filter out the current event from related events
+  const filteredRelatedEvents = relatedEvents.filter(relatedEvent => relatedEvent._id !== event._id);
 
   if (!event) {
     return <Typography>Loading...</Typography>;
@@ -46,23 +45,30 @@ const EventDetails = () => {
       <Box
         display="flex"
         justifyContent="center"
-        bgcolor="slategrey"
         py={4}
         px={2}
+        sx={{ bgcolor: 'background.default' }}
       >
         <Grid container spacing={2} maxWidth="lg">
-          <Grid item xs={12} md={6} display="flex" alignItems="stretch">
+          <Grid item xs={12} md={6}>
             <Avatar
               variant="square"
               src={event.imageUrl}
               alt="hero image"
-              sx={{ width: '100%', height: 'auto', minHeight: 300, maxHeight:'80vh' ,objectFit: 'cover', objectPosition: 'center' }}
+              sx={{
+                width: '100%',
+                height: 'auto',
+                minHeight: 300,
+                maxHeight: '80vh',
+                objectFit: 'cover',
+                objectPosition: 'center',
+              }}
             />
           </Grid>
 
-          <Grid item xs={12} md={6} display="flex" alignItems="stretch">
-            <Paper elevation={3} sx={{ padding: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h2" gutterBottom>{event.title}</Typography>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3} sx={{ padding: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h4" gutterBottom>{event.title}</Typography>
               <Box display="flex" flexDirection="column" gap={2} flexGrow={1}>
                 <Box display="flex" gap={2}>
                   <Chip

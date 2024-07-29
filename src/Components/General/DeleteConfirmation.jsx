@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, IconButton, CircularProgress } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import deleteIcon from '../../assets/icons/delete.svg'
 import deleteEvent from '../../Utils/DeleteEvent';
 
 const DeleteConfirmation = ({ eventId }) => {
   const [open, setOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
-  const handleClickOpen = () => {
+  const handleClickOpen = () => { 
     setOpen(true);
   };
 
@@ -32,7 +32,11 @@ const DeleteConfirmation = ({ eventId }) => {
   return (
     <>
       <IconButton onClick={handleClickOpen} aria-label="delete">
-        <DeleteIcon />
+        <img
+          src={deleteIcon}
+          alt="Delete"
+          style={{ width: 24, height: 24 }}
+        />
       </IconButton>
 
       <Dialog

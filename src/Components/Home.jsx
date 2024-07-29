@@ -5,11 +5,15 @@ import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import EventCard from './Events/EventCard';
 import { SERVER_URL } from '../Utils/Constants';
+import Search from './General/Search';
+import CategoryFilter from './General/CategoryFilter';
+import { useLocation } from 'react-router-dom';
 
 export default function Home() {
-
   const [events, setEvents] = useState([]);
-
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const location = useLocation();
+  
   const ColorButton = styled(Button)(() => ({
     backgroundColor: '#705CF7',
     '&:hover': {
@@ -28,10 +32,34 @@ export default function Home() {
     };
 
     fetchEvents();
-  }
-  , []);
+  }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get('query') || '';
+    const category = params.get('category') || '';
 
+    const applyFilters = () => {
+      let filtered = events;
+
+      if (query) {
+        filtered = filtered.filter(event => 
+          event.title.toLowerCase().includes(query.toLowerCase()),
+          
+        );
+      }
+
+      if (category && category !== 'All') {
+        filtered = filtered.filter(event => 
+          event.category.name === category
+        );
+      }
+
+      setFilteredEvents(filtered);
+    };
+
+    applyFilters();
+  }, [events, location.search]);
 
   return (
     <>
@@ -41,15 +69,14 @@ export default function Home() {
             <h1 className="h1-bold">Host, Connect, Celebrate: Your Events, Our Platform!</h1>
             <p className="p-regular-20 md:p-regular-24">Book and learn helpful tips from 3,168+ mentors in world-class companies with our global community.</p>
             <a href='#events'>
-            <ColorButton
-              variant="contained"
-              size="large"
-              sx={{borderRadius: '9999px'}}
-              className="w-full sm:w-fit bg-orange-400 hover:bg-orange-500 text-white"
-              
-            >
-              Explore Now
-            </ColorButton>
+              <ColorButton
+                variant="contained"
+                size="large"
+                sx={{borderRadius: '9999px'}}
+                className="w-full sm:w-fit  text-white"
+              >
+                Explore Now
+              </ColorButton>
             </a>
           </div>
 
@@ -64,13 +91,21 @@ export default function Home() {
       </section>
 
       <section id="events" className="wrapper my-8 flex flex-col gap-8 md:gap-12">
-      <h2 className="h2-bold">Trust by <br /> Thousands of Events</h2>
-        <div className='flex flex-row flex-wrap gap-12 justify-center items-center'>
-        {events?.map((event) => (
-          <EventCard key={event._id} event={event} />
-        ))}
-        </div>
+        <h2 className="h2-bold">Trust by <br /> Thousands of Events</h2>
 
+        <div className="flex w-full flex-col gap-5 md:flex-row">
+          <Search />
+          <CategoryFilter />
+        </div>
+        
+        <div className='flex flex-row flex-wrap gap-12 justify-center items-center'>
+          {filteredEvents.length === 0 && (
+            <h3 className="h3-bold p-72">No events found</h3>
+          )}
+          {filteredEvents?.map((event) => (
+            <EventCard key={event._id} event={event} />
+          ))}
+        </div>
       </section>
     </>
   );
