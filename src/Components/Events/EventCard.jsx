@@ -38,6 +38,7 @@ const EventCard = ({ event, hidePrice }) => {
         borderRadius: 4,
         transition: 'all 0.3s',
         '&:hover': { boxShadow: 6 },
+        paddingBottom:5,
       }}
     >
       <Box sx={{ position: 'relative', height: '100%', borderRadius: 'inherit' }}>
