@@ -5,6 +5,7 @@ import EventForm from './EventForm';
 import { useAuth } from '@clerk/clerk-react';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
+import { SERVER_URL } from '../../Utils/Constants';
 
 const EventFormSchema = Yup.object().shape({
   title: Yup.string().required('Title is required'),
@@ -31,7 +32,7 @@ const UpdateEvent = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/categories');
+        const response = await axios.get(`${SERVER_URL}/api/categories`);
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -63,7 +64,7 @@ const UpdateEvent = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/events/${id}`);
+        const response = await axios.get(`${SERVER_URL}/api/events/${id}`);
         const event = response.data;
 
         // Transform the category to its _id
@@ -83,7 +84,7 @@ const UpdateEvent = () => {
   // Submit event values
   const handleSubmit = async (values) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/events/${id}`, values);
+      const response = await axios.put(`${SERVER_URL}/api/events/${id}`, values);
       if (response.status === 200) {
         Swal.fire('Success', 'Event updated successfully', 'success');
         navigate(`/events/${id}`); // Navigate to the event details page

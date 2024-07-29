@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Button, Box, Typography, Grid, Pagination } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 import EventCard from './Events/EventCard';
+import { SERVER_URL } from '../Utils/Constants';
 
 const ProfilePage = () => {
   const userId = useParams().id;
@@ -23,7 +24,7 @@ const ProfilePage = () => {
   useEffect(() => {
     // const fetchOrders = async () => {
     //   try {
-    //     const response = await axios.get(`http://localhost:5000/api/orders/user/${userId}`);
+    //     const response = await axios.get(`SERVER_URL/api/orders/user/${userId}`);
     //     setOrders(response.data.data);
     //     setOrderedEvents(response.data.data.map((order) => order.event));
     //     setOrdersTotalPages(response.data.totalPages);
@@ -34,7 +35,7 @@ const ProfilePage = () => {
 
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/events/user/${userId}`);
+        const response = await axios.get(`${SERVER_URL}/api/events/user/${userId}`);
         setOrganizedEvents(response.data);
         setEventsTotalPages(response.data.totalPages);
         console.log()

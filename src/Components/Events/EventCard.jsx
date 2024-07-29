@@ -12,6 +12,8 @@ const EventCard = ({ event, hidePrice }) => {
   const { userId } = useAuth();
   const [user, setUser] = useState(null);
 
+  
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -25,6 +27,7 @@ const EventCard = ({ event, hidePrice }) => {
 
     fetchUser();
   }, [userId]);
+
 
   const eventOrganizerId = event?.organizer?._id?.toString();
   const isEventCreator = user?._id === eventOrganizerId;

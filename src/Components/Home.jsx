@@ -4,6 +4,7 @@ import heroImg from "../assets/images/hero.png";
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import EventCard from './Events/EventCard';
+import { SERVER_URL } from '../Utils/Constants';
 
 export default function Home() {
 
@@ -19,7 +20,7 @@ export default function Home() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const eventsResponse = await axios.get(`http://localhost:5000/api/events`);
+        const eventsResponse = await axios.get(`${SERVER_URL}/api/events`);
         setEvents(eventsResponse.data);
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -65,7 +66,7 @@ export default function Home() {
       <section id="events" className="wrapper my-8 flex flex-col gap-8 md:gap-12">
       <h2 className="h2-bold">Trust by <br /> Thousands of Events</h2>
         <div className='flex flex-row flex-wrap gap-12 justify-center items-center'>
-        {events.map((event) => (
+        {events?.map((event) => (
           <EventCard key={event._id} event={event} />
         ))}
         </div>

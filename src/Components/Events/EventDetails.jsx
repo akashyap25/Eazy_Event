@@ -6,6 +6,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import formatDateTime from '../../Utils/FormatDate';
 import EventCard from './EventCard';
+import { SERVER_URL } from '../../Utils/Constants';
 
 const EventDetails = () => {
   const { id } = useParams();
@@ -15,9 +16,9 @@ const EventDetails = () => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const eventResponse = await axios.get(`http://localhost:5000/api/events/${id}`);
+        const eventResponse = await axios.get(`${SERVER_URL}/api/events/${id}`);
         setEvent(eventResponse.data);
-        const relatedEventsResponse = await axios.get(`http://localhost:5000/api/events/related`, {
+        const relatedEventsResponse = await axios.get(`${SERVER_URL}/api/events/related`, {
           params: {
             categoryId: eventResponse.data.category._id,
             eventId: eventResponse.data._id,

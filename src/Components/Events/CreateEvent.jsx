@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import EventForm from "./EventForm";
 import GetUser from '../../Utils/GetUser';
 import * as Yup from 'yup';
+import { SERVER_URL } from '../../Utils/Constants';
 
 const EventFormSchema = Yup.object().shape({
   title: Yup.string().required('Title is required'),
@@ -42,7 +43,7 @@ const CreateEvent = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/categories');
+        const response = await axios.get(`${SERVER_URL}/api/categories`);
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -93,7 +94,7 @@ const CreateEvent = () => {
 
       console.log(values);
 
-      const response = await axios.post('http://localhost:5000/api/events/create', values);
+      const response = await axios.post(`${SERVER_URL}/api/events/create`, values);
 
       if (response.data.success) {
         Swal.fire('Success', 'Event created successfully!', 'success');
