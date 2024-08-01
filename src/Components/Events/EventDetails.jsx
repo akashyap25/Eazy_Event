@@ -7,6 +7,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import formatDateTime from '../../Utils/FormatDate';
 import EventCard from './EventCard';
 import { SERVER_URL } from '../../Utils/Constants';
+import CheckoutButton from '../General/CheckoutButton';
 
 const EventDetails = () => {
   const { id } = useParams();
@@ -84,6 +85,8 @@ const EventDetails = () => {
                   by <span style={{ color: '#3f51b5' }}>{event.organizer.firstName} {event.organizer.lastName}</span>
                 </Typography>
               </Box>
+
+              <CheckoutButton event={event} />
 
               <Box display="flex" flexDirection="column" gap={2} mt={2}>
                 <Box display="flex" alignItems="center" gap={1}>
