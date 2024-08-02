@@ -157,18 +157,18 @@ const EventDetails = () => {
       </Box>
 
       {/* Related Events */}
-      <Box py={8} px={2} display="flex" justifyContent="center">
-        <Box maxWidth="lg" width="100%">
-          <Typography variant="h4" gutterBottom>Related Events</Typography>
-          <Grid container spacing={2} justifyContent="center">
-            {relatedEvents.filter(relatedEvent => relatedEvent._id !== event._id).map((relatedEvent) => (
-              <Grid item xs={12} sm={6} md={4} key={relatedEvent._id}>
-                <EventCard event={relatedEvent} />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      </Box>
+      <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
+      <h2 className="h2-bold ml-10">Related Events</h2>
+      <div className='flex flex-row flex-wrap gap-12 justify-center items-center'>
+        
+          {relatedEvents.length == 0 && (
+            <h3 className="h3-bold p-72">No Related Events</h3> 
+          )}
+          {relatedEvents.filter(relatedEvents => relatedEvents._id !== event._id).map((event) => (
+            <EventCard key={event._id} event={event} />
+          ))}
+        </div>
+        </section>
     </>
   );
 };
