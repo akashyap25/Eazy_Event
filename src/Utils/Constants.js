@@ -1,4 +1,4 @@
-const SERVER_URL = 'http://eazy-event-env.eba-mjmmz2gp.ap-northeast-1.elasticbeanstalk.com/';
+const SERVER_URL = 'https://eazy-event-server.onrender.com';
 
 const STRIPE_KEY = 'pk_test_TYooMQauvdEDq54NiTphI7jx'
 
