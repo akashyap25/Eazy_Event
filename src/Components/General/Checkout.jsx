@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import checkoutOrder from '../../Utils/CheckoutOrder';
 
 const Checkout = ({ event, userId }) => {
@@ -15,7 +15,7 @@ const Checkout = ({ event, userId }) => {
   }, []);
 
   const onCheckout = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     const order = {
       eventTitle: event.title,
       eventId: event._id,
@@ -28,11 +28,19 @@ const Checkout = ({ event, userId }) => {
   };
 
   return (
-    <form onSubmit={onCheckout}>
-      <Button type="submit" variant="contained" color="primary" size="large">
-        {event.isFree ? 'Get Ticket' : 'Buy Ticket'}
-      </Button>
-    </form>
+    <div>
+      {event.organizer._id === userId ? (
+        <Typography variant="h6" color="textSecondary">
+          You are the creator of this event. You don't need to buy a ticket.
+        </Typography>
+      ) : (
+        <form onSubmit={onCheckout}>
+          <Button type="submit" variant="contained" color="primary" size="large">
+            {event.isFree ? 'Get Ticket' : 'Buy Ticket'}
+          </Button>
+        </form>
+      )}
+    </div>
   );
 };
 

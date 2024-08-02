@@ -1,18 +1,38 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Grid, Paper, Avatar, Chip } from '@mui/material';
+import { useParams, Link } from 'react-router-dom';
+import { Box, Typography, Grid, Paper, Avatar, Chip, IconButton } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import formatDateTime from '../../Utils/FormatDate';
 import EventCard from './EventCard';
 import { SERVER_URL } from '../../Utils/Constants';
 import CheckoutButton from '../General/CheckoutButton';
+import DeleteConfirmation from '../General/DeleteConfirmation';
+import EditIcon from '../../assets/icons/edit.svg';
+import { useAuth } from "@clerk/clerk-react";
+import getUser from '../../Utils/GetUser';
 
 const EventDetails = () => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
   const [relatedEvents, setRelatedEvents] = useState([]);
+  const { userId } = useAuth(); 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        if (!userId) return;
+        const fetchedUser = await getUser(userId);
+        setUser(fetchedUser);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -34,12 +54,12 @@ const EventDetails = () => {
     fetchEventDetails();
   }, [id]);
 
-  // Filter out the current event from related events
-  const filteredRelatedEvents = relatedEvents.filter(relatedEvent => relatedEvent._id !== event._id);
-
   if (!event) {
     return <Typography>Loading...</Typography>;
   }
+
+  const eventOrganizerId = event?.organizer?._id?.toString();
+  const isEventCreator = user?._id === eventOrganizerId;
 
   return (
     <>
@@ -69,7 +89,17 @@ const EventDetails = () => {
 
           <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ padding: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="h4" gutterBottom>{event.title}</Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="h4" gutterBottom>{event.title}</Typography>
+                {isEventCreator && (
+                  <Box display="flex" gap={1}>
+                    <IconButton component={Link} to={`/events/${event._id}/update`} color="primary">
+                      <img src={EditIcon} alt="Edit" style={{ width: 24, height: 24 }} />
+                    </IconButton>
+                    <DeleteConfirmation eventId={event._id} />
+                  </Box>
+                )}
+              </Box>
               <Box display="flex" flexDirection="column" gap={2} flexGrow={1}>
                 <Box display="flex" gap={2}>
                   <Chip
@@ -131,7 +161,7 @@ const EventDetails = () => {
         <Box maxWidth="lg" width="100%">
           <Typography variant="h4" gutterBottom>Related Events</Typography>
           <Grid container spacing={2} justifyContent="center">
-            {filteredRelatedEvents.map((relatedEvent) => (
+            {relatedEvents.filter(relatedEvent => relatedEvent._id !== event._id).map((relatedEvent) => (
               <Grid item xs={12} sm={6} md={4} key={relatedEvent._id}>
                 <EventCard event={relatedEvent} />
               </Grid>

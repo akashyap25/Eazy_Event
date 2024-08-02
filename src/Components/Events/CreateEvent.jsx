@@ -92,8 +92,6 @@ const CreateEvent = () => {
 
       values.organizer = user._id;
 
-      console.log(values);
-
       const response = await axios.post(`${SERVER_URL}/api/events/create`, values);
 
       if (response.data.success) {
