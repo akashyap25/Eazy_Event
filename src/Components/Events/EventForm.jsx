@@ -6,7 +6,6 @@ import {
   MenuItem,
   Checkbox,
   FormControlLabel,
-  Box,
   IconButton,
   InputAdornment,
 } from '@mui/material';
@@ -33,7 +32,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
 
   return (
     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
-      <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={5}>
+      <div className="flex flex-col gap-5 md:flex-row">
         <TextField
           fullWidth
           label="Event Title"
@@ -44,7 +43,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           helperText={formik.touched.title && formik.errors.title}
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
         />
@@ -59,7 +58,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           helperText={formik.touched.category && formik.errors.category}
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
         >
@@ -69,9 +68,9 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
             </MenuItem>
           ))}
         </TextField>
-      </Box>
+      </div>
 
-      <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={5}>
+      <div className="flex flex-col gap-5 md:flex-row ">
         <TextField
           fullWidth
           multiline
@@ -86,23 +85,11 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           helperText={formik.touched.description && formik.errors.description}
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
         />
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          border="1px dashed grey"
-          sx={{
-            borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
-            width: "100%",
-            height: '265px',
-          }}
-        >
+        <div className="flex flex-col items-center content-center bg-slate-100  border-2 border-dashed border-gray-400 rounded-3xl w-full h-64" >
           {imagePreview ? (
             <img
               src={imagePreview}
@@ -123,17 +110,11 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
                         "imageUrl",
                         URL.createObjectURL(fileList[0])
                       );
-                      setImagePreview(URL.createObjectURL(fileList[0])); // Set image preview
+                      setImagePreview(URL.createObjectURL(fileList[0])); 
                     }
                   }}
                 />
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  justifyContent="center"
-                  fontSize=".6em"
-                >
+                <div className="flex flex-col items-center content-center font-light" >
                   <img
                     src={UploadFileIcon}
                     alt="Upload icon"
@@ -141,7 +122,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
                   />
                   <p>Drag Photo Here..</p>
                   <p>SVG, PNG, JPG</p>
-                </Box>
+                </div>
               </IconButton>
               <ColorButton
                 variant="contained"
@@ -154,10 +135,10 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
               </ColorButton>
             </>
           )}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={5}>
+      <div className="flex flex-col gap-5 md:flex-row">
         <TextField
           fullWidth
           label="Location"
@@ -179,13 +160,13 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           }}
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
         />
-      </Box>
+      </div>
 
-      <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={5}>
+      <div className="flex flex-col gap-5 md:flex-row">
         <TextField
           fullWidth
           label="Start Date & Time"
@@ -220,7 +201,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           }
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
           inputProps={{
@@ -259,7 +240,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           helperText={formik.touched.endDateTime && formik.errors.endDateTime}
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
           inputProps={{
@@ -268,9 +249,9 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
             },
           }}
         />
-      </Box>
+      </div>
 
-      <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={5}>
+      <div className="flex flex-col gap-5 md:flex-row"  >
         <TextField
           fullWidth
           type="number"
@@ -311,7 +292,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           }}
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
         />
@@ -336,11 +317,11 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           }}
           sx={{
             borderRadius: "20px",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "#f1f5f9",
             "& .MuiInputBase-root": { borderRadius: "20px" },
           }}
         />
-      </Box>
+      </div>
 
       <ColorButton
         type="submit"

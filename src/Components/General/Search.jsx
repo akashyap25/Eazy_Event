@@ -24,16 +24,10 @@ const Search = ({ placeholder = 'Search title...' }) => {
     return () => clearTimeout(delayDebounceFn);
   }, [query, location.search, navigate]); 
 
+
+
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      minHeight: '54px',
-      width: '100%',
-      overflow: 'hidden',
-      borderRadius: '9999px', 
-      backgroundColor: '#f0f0f0', 
-    }}>
+    <div className='flex items-center w-full min-h-4 overflow-hidden rounded-s-full '>
       <TextField
         type="text"
         placeholder={placeholder}

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import heroImg from "../assets/images/hero.png";
-import Button from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
 import EventCard from './Events/EventCard';
 import { SERVER_URL } from '../Utils/Constants';
 import Search from './General/Search';
@@ -14,12 +12,7 @@ export default function Home() {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const location = useLocation();
   
-  const ColorButton = styled(Button)(() => ({
-    backgroundColor: '#705CF7',
-    '&:hover': {
-      backgroundColor: '#5c49D9',
-    },
-  }));
+
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -69,14 +62,10 @@ export default function Home() {
             <h1 className="h1-bold">Host, Connect, Celebrate: Your Events, Our Platform!</h1>
             <p className="p-regular-20 md:p-regular-24">Book and learn helpful tips from 3,168+ mentors in world-class companies with our global community.</p>
             <a href='#events'>
-              <ColorButton
-                variant="contained"
-                size="large"
-                sx={{borderRadius: '9999px'}}
-                className="w-full sm:w-fit  text-white"
+              <button  size="lg" className="bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-full sm:w-auto text-sm sm:text-base"
               >
                 Explore Now
-              </ColorButton>
+              </button>
             </a>
           </div>
 
@@ -98,7 +87,7 @@ export default function Home() {
           <CategoryFilter />
         </div>
         
-        <div className='flex flex-row flex-wrap gap-12 justify-center items-center'>
+        <div className='flex flex-row flex-wrap gap-8 justify-center items-center'>
           {filteredEvents.length === 0 && (
             <h3 className="h3-bold p-72">No events found</h3>
           )}

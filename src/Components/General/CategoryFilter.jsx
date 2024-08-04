@@ -35,14 +35,7 @@ const CategoryFilter = () => {
   };
 
   return (
-    <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        minHeight: '54px',
-        width: '100%',
-        borderRadius: '9999px', 
-        backgroundColor: '#f0f0f0', 
-      }}>
+    <div className='flex items-center w-full min-h-14 rounded-s-full '>
     <FormControl fullWidth sx={{
             borderRadius: "20px",
             backgroundColor: "#f0f0f0",

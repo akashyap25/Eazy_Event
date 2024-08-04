@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useAuth } from "@clerk/clerk-react";
 import formatDateTime from '../../Utils/FormatDate';
@@ -8,9 +7,11 @@ import GetUser from '../../Utils/GetUser';
 import DeleteConfirmation from '../General/DeleteConfirmation';
 import EditIcon from '../../assets/icons/edit.svg';
 
+
 const EventCard = ({ event, hidePrice }) => {
   const { userId } = useAuth();
   const [user, setUser] = useState(null);
+  const hasOrderLink = event?.organizer?._id === userId;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -30,82 +31,57 @@ const EventCard = ({ event, hidePrice }) => {
   const isEventCreator = user?._id === eventOrganizerId;
 
   return (
-    <Card
-      sx={{
-        width: { xs: '100%', sm: 345 },
-        height: 400,
-        boxShadow: 3,
-        borderRadius: 4,
-        transition: 'all 0.3s',
-        '&:hover': { boxShadow: 6 },
-        paddingBottom:5,
-      }}
-    >
-      <Box sx={{ position: 'relative', height: '100%', borderRadius: 'inherit' }}>
-        {isEventCreator && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              zIndex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1,
-              bgcolor: 'white',
-              borderRadius: '15px',
-            }}
-          >
-            <IconButton component={Link} to={`/events/${event?._id}/update`} color="primary">
-              <img src={EditIcon} alt="Edit" style={{ width: 24, height: 24 }} />
-            </IconButton>
-            <DeleteConfirmation eventId={event?._id} />
-          </Box>
-        )}
-        <CardActionArea component={Link} to={`/events/${event?._id}`} sx={{ height: '100%', borderRadius: 'inherit' }}>
-          <Box display="flex" flexDirection="column" height="100%" sx={{ borderRadius: 'inherit' }}>
-            <Box sx={{ height: '60%', position: 'relative' }}>
-              <CardMedia
-                component="img"
-                image={event?.imageUrl}
-                alt={event?.title}
-                sx={{ height: '100%', width: '100%', objectFit: 'cover', backgroundColor: '#f5f5f5', borderRadius: 'inherit' }}
-              />
-            </Box>
-            <Box sx={{ height: '40%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <CardContent sx={{ paddingBottom: 0, flexGrow: 1 }}>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{
-                    fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }, // Adjust font size for different screen sizes
-                    overflow: 'hidden', // Ensure text doesn't overflow
-                    textOverflow: 'ellipsis', // Add ellipsis if text is too long
-                    whiteSpace: 'nowrap' // Prevent text from wrapping to the next line
-                  }}
-                >
-                  {event?.title}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {formatDateTime(event?.startDateTime)}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  by <span style={{ color: '#3f51b5' }}>{event?.organizer?.firstName} {event?.organizer?.lastName}</span>
-                </Typography>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-                  {!hidePrice && (
-                    <>
-                      <Chip label={event?.isFree ? 'FREE' : `₹${event?.price}`} color="success" />
-                      <Chip label={event?.category?.name} sx={{ backgroundColor: '#e0e0e0', color: '#757575' }} />
-                    </>
-                  )}
-                </Box>
-              </CardContent>
-            </Box>
-          </Box>
-        </CardActionArea>
-      </Box>
-    </Card>
+    <div className="group relative flex min-h-[380px] w-full max-w-[400px] flex-col overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg md:min-h-[438px]">
+    <Link 
+      to={`/events/${event._id}`}
+      style={{backgroundImage: `url(${event.imageUrl})`}}
+      className="flex-center flex-grow bg-gray-50 bg-cover bg-center text-grey-500"
+    />
+            {isEventCreator && !hidePrice && (
+        <div className="absolute right-2 top-2 flex flex-col gap-4 rounded-xl bg-white p-3 shadow-sm transition-all">
+          <Link href={`/events/${event._id}/update`}>
+            <img src={EditIcon} alt="edit" width={24} height={24} className='ml-2' />
+          </Link>
+
+          <DeleteConfirmation eventId={event._id} />
+        </div>
+      )}
+
+        
+<div
+        className="flex min-h-[230px] flex-col gap-3 p-5 md:gap-4"
+      > 
+       {!hidePrice && <div className="flex gap-2">
+          <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-60">
+            {event.isFree ? 'FREE' : `₹${event.price}`}
+          </span>
+          <p className="p-semibold-14 w-min rounded-full bg-grey-500/10 px-4 py-1 text-grey-500 line-clamp-1">
+            {event.category.name}
+          </p>
+        </div>}
+
+        <p className="p-medium-16 p-medium-18 text-grey-500">
+        {formatDateTime(event?.startDateTime)}
+        </p>
+
+        <Link to={`/events/${event._id}`}>
+          <p className="p-medium-16 md:p-medium-20 line-clamp-2 flex-1 text-black">{event.title}</p>
+        </Link>
+
+        <div className="flex-between w-full">
+          <p className="p-medium-14 md:p-medium-16 text-grey-600">
+            By {event.organizer.firstName} {event.organizer.lastName}
+          </p>
+
+          {/* {hasOrderLink && (
+            <Link href={`/orders?eventId=${event._id}`} className="flex gap-2">
+              <p className="text-primary-500">Order Details</p>
+              <img src={Arrow} alt="search" width={10} height={10} />
+            </Link>
+          )} */}
+        </div>
+      </div>
+    </div>
   );
 };
 

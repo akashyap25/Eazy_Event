@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button, Box, Typography, Grid, Pagination } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 import EventCard from './Events/EventCard';
 import { SERVER_URL } from '../Utils/Constants';
@@ -11,10 +10,6 @@ const ProfilePage = () => {
   const [orders, setOrders] = useState([]);
   const [orderedEvents, setOrderedEvents] = useState([]);
   const [organizedEvents, setOrganizedEvents] = useState([]);
-  const [ordersPage, setOrdersPage] = useState(1);
-  const [eventsPage, setEventsPage] = useState(1);
-  const [ordersTotalPages, setOrdersTotalPages] = useState(1);
-  const [eventsTotalPages, setEventsTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -22,7 +17,6 @@ const ProfilePage = () => {
         const response = await axios.get(`${SERVER_URL}/api/orders/user/${userId}`);
         setOrders(response.data.data);
         setOrderedEvents(response.data.data.map((order) => order.event));
-        setOrdersTotalPages(response.data.totalPages);
       } catch (error) {
         console.error('Error fetching orders:', error);
       }
@@ -32,7 +26,6 @@ const ProfilePage = () => {
       try {
         const response = await axios.get(`${SERVER_URL}/api/events/user/${userId}`);
         setOrganizedEvents(response.data);
-        setEventsTotalPages(response.data.totalPages);
       } catch (error) {
         console.error('Error fetching events:', error);
       }
@@ -42,125 +35,69 @@ const ProfilePage = () => {
       fetchOrders();
       fetchEvents();
     }
-  }, [userId, ordersPage, eventsPage]);
+  }, [userId]);
 
   return (
     <>
       {/* My Tickets */}
-      <Box sx={{ py: { xs: 4, sm: 5 }, px: { xs: 2, sm: 5, md: 8 } }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: { xs: 'center', sm: 'space-between' },
-            alignItems: 'center',
-            textAlign: { xs: 'center', sm: 'left' }
-          }}
-        >
-          <Typography variant="h5" component="h3" sx={{ fontSize: { xs: '1.25rem', sm: '1.75rem' } }}>
-            My Tickets
-          </Typography>
-          <Button
-            variant="contained"
-            component={Link}
-            to="/#events"
-            sx={{
-              bgcolor: '#705CF7',
-              '&:hover': { bgcolor: '#5c49D9' },
-              borderRadius: '9999px',
-              mt: { xs: 2, sm: 0 },
-              width: { xs: '100%', sm: 'auto' },
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              height: 'auto',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            Explore More Events
-          </Button>
-        </Box>
-      </Box>
+      <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
+        <div className="wrapper flex items-center justify-center sm:justify-between">
+        <h3 className='h3-bold text-center sm:text-left'>My Tickets</h3>
+        <button  size="lg" className="bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-full sm:w-auto text-sm sm:text-base">
+            <Link to="/#events">
+              Explore More Events
+            </Link>
+          </button>
+        </div>
+      </section>
 
-      <Box sx={{ my: 8, mx: { xs: 2, sm: 5 } }}>
+      <section className="wrapper my-8">
         {orderedEvents?.length > 0 ? (
-          <Grid container spacing={2}>
-            {orderedEvents?.map((event, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <EventCard event={event} isEventCreator={false} />
-              </Grid>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {orderedEvents.map((event, index) => (
+              <EventCard key={index} event={event} isEventCreator={false} />
             ))}
-          </Grid>
+          </div>
         ) : (
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6">No event tickets purchased yet</Typography>
-            <Typography>No worries - plenty of exciting events to explore!</Typography>
-          </Box>
+          <div className="text-center">
+            <h6 className="text-lg font-semibold">No event tickets purchased yet</h6>
+            <p>No worries - plenty of exciting events to explore!</p>
+          </div>
         )}
-        <Pagination
-          count={ordersTotalPages}
-          page={ordersPage}
-          onChange={(e, page) => setOrdersPage(page)}
-          sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}
-        />
-      </Box>
+      </section>
 
       {/* Events Organized */}
-      <Box sx={{ py: { xs: 4, sm: 5 }, px: { xs: 2, sm: 5, md: 8 } }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: { xs: 'center', sm: 'space-between' },
-            alignItems: 'center',
-            textAlign: { xs: 'center', sm: 'left' }
-          }}
-        >
-          <Typography variant="h5" component="h3" sx={{ fontSize: { xs: '1.25rem', sm: '1.75rem' } }}>
-            Events Organized
-          </Typography>
-          <Button
-            variant="contained"
-            component={Link}
-            to="/events/create"
-            sx={{
-              bgcolor: '#705CF7',
-              '&:hover': { bgcolor: '#5c49D9' },
-              borderRadius: '9999px',
-              mt: { xs: 2, sm: 0 },
-              width: { xs: '100%', sm: 'auto' },
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              height: 'auto',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            Create New Event
-          </Button>
-        </Box>
-      </Box>
+      <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
+      <div className="wrapper flex items-center justify-center sm:justify-between">
+          <h3 className="h3-bold text-center sm:text-left">Events Organized</h3>
+          <button  size="lg" className="bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-full sm:w-auto text-sm sm:text-base">
+            <Link to="/events/create">
+              Create New Event
+            </Link>
+          </button>
+        </div>
+      </section>
 
-      <Box sx={{ my: 4, mx: { xs: 2, sm: 5 } }}>
+      <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
         {organizedEvents?.length > 0 ? (
-          <Grid container spacing={2} justifyContent="center">
-            {organizedEvents?.map((event, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <EventCard event={event} isEventCreator />
-              </Grid>
+         <div className='flex flex-row flex-wrap gap-12 justify-center items-center'>
+            {organizedEvents.map((event, index) => (
+              <EventCard key={index} event={event} isEventCreator />
             ))}
-          </Grid>
+          </div>
         ) : (
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6">No events have been created yet</Typography>
-            <Typography>Go create some now</Typography>
-          </Box>
+          <div className="text-center">
+          <h6 className="text-lg font-semibold">No event tickets purchased yet</h6>
+          <p>No worries - plenty of exciting events to explore!</p>
+        </div>
         )}
-        <Pagination
-          count={eventsTotalPages}
-          page={eventsPage}
-          onChange={(e, page) => setEventsPage(page)}
-          sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}
-        />
-      </Box>
+       
+      </section>
     </>
   );
 };
 
 export default ProfilePage;
+
+
+
