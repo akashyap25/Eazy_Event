@@ -12,8 +12,6 @@ export default function Home() {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const location = useLocation();
   
-
-
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -38,7 +36,6 @@ export default function Home() {
       if (query) {
         filtered = filtered.filter(event => 
           event.title.toLowerCase().includes(query.toLowerCase()),
-          
         );
       }
 
@@ -48,11 +45,31 @@ export default function Home() {
         );
       }
 
-      setFilteredEvents(filtered);
+      const now = new Date();
+
+      // Ongoing events
+      const ongoingEvents = filtered
+        .filter(event => new Date(event.startDateTime) <= now && new Date(event.endDateTime) >= now)
+        .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime));
+
+      // Upcoming events
+      const upcomingEvents = filtered
+        .filter(event => new Date(event.startDateTime) > now)
+        .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime));
+
+      // Past events
+      const pastEvents = filtered
+        .filter(event => new Date(event.endDateTime) < now)
+        .sort((a, b) => new Date(b.endDateTime) - new Date(a.endDateTime));
+
+      // Combine all events
+      setFilteredEvents([...ongoingEvents, ...upcomingEvents, ...pastEvents]);
     };
 
     applyFilters();
   }, [events, location.search]);
+
+
 
   return (
     <>
@@ -62,8 +79,7 @@ export default function Home() {
             <h1 className="h1-bold">Host, Connect, Celebrate: Your Events, Our Platform!</h1>
             <p className="p-regular-20 md:p-regular-24">Book and learn helpful tips from 3,168+ mentors in world-class companies with our global community.</p>
             <a href='#events'>
-              <button  size="lg" className="bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-full sm:w-auto text-sm sm:text-base"
-              >
+              <button size="lg" className="bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-full sm:w-auto text-sm sm:text-base">
                 Explore Now
               </button>
             </a>
@@ -80,7 +96,7 @@ export default function Home() {
       </section>
 
       <section id="events" className="wrapper my-8 flex flex-col gap-8 md:gap-12">
-        <h2 className="h2-bold">Trust by <br /> Thousands of Events</h2>
+        <h2 className="h2-bold">Trusted by <br /> Thousands of Events</h2>
 
         <div className="flex w-full flex-col gap-5 md:flex-row">
           <Search />
@@ -91,7 +107,7 @@ export default function Home() {
           {filteredEvents.length === 0 && (
             <h3 className="h3-bold p-72">No events found</h3>
           )}
-          {filteredEvents?.map((event) => (
+          {filteredEvents.map((event) => (
             <EventCard key={event._id} event={event} />
           ))}
         </div>

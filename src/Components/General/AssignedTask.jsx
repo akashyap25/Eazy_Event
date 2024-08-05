@@ -98,43 +98,47 @@ const AssignedTask = () => {
   };
 
   return (
-    <section className="wrapper py-8 h-screen">
+    <section className="wrapper py-8 min-h-screen">
       <div className="bg-white p-5 rounded-lg shadow-lg h-full">
         <h1 className="h3-bold text-center mb-8">Assigned Tasks</h1>
         <ul className="flex flex-col gap-8">
-
-            {tasks.length === 0 && (
-                <p className="text-center text-gray-500 p-40">No tasks assigned</p>
-            )}
-          {tasks.map((task) => (
-            <li
-              key={task._id}
-              className={`p-4 rounded-lg shadow-md border-4 ${getTaskBorderStyle(task)} mb-4`}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="h4-bold flex items-center">
-                    {task.title} 
-                    <Link to={`/events/${task.event._id}`} className="text-blue-600 ml-2 text-lg">
-                      ({task.event.title})
-                    </Link>
-                  </h2>
-                  <p className="text-gray-600 mb-2">{task.description}</p>
-                  <p className="text-sm text-gray-500">Deadline: {formatDateTime(task.deadline)}</p>
-                  {getTaskWarning(task)}
+          {tasks.length === 0 && (
+            <p className="text-center text-gray-500 p-40">No tasks assigned</p>
+          )}
+          {tasks.map((task) => {
+            const { dateOnly, timeOnly } = formatDateTime(task.deadline);
+            return (
+              <li
+                key={task._id}
+                className={`p-4 rounded-lg shadow-md border-4 ${getTaskBorderStyle(task)} mb-4`}
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="h4-bold flex items-center">
+                      {task.title} 
+                      <Link to={`/events/${task.event._id}`} className="text-blue-600 ml-2 text-lg">
+                        ({task.event.title})
+                      </Link>
+                    </h2>
+                    <p className="text-gray-600 mb-2">{task.description}</p>
+                    <p className="text-sm text-gray-500">
+                      Deadline: {dateOnly} {timeOnly}
+                    </p>
+                    {getTaskWarning(task)}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={task.completed === true}
+                      onChange={() => handleTaskCompletionChange(task)}
+                    />
+                    <label htmlFor={`task-checkbox-${task._id}`} className="text-gray-700">
+                      Mark task as completed
+                    </label>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={task.completed === true}
-                    onChange={() => handleTaskCompletionChange(task)}
-                  />
-                  <label htmlFor={`task-checkbox-${task._id}`} className="text-gray-700">
-                    Mark task as completed
-                  </label>
-                </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
 

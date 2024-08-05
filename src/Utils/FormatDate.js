@@ -1,17 +1,27 @@
 const formatDateTime = (datetime) => {
-    const date = new Date(datetime);
+  const date = new Date(datetime);
   
-    const options = {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',  
-    };
-  
-    const formattedDate = new Intl.DateTimeFormat('en-IN', options).format(date);
-    return formattedDate;
+  const dateOptions = {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   };
 
-  export default formatDateTime;
+  const timeOptions = {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  };
+
+  const formattedDate = new Intl.DateTimeFormat('en-IN', dateOptions).format(date);
+  const formattedTime = new Intl.DateTimeFormat('en-IN', timeOptions).format(date);
+
+  return {
+    dateOnly: formattedDate,
+    timeOnly: formattedTime,
+  };
+};
+
+export default formatDateTime;

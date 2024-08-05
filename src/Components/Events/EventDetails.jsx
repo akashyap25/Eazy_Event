@@ -58,6 +58,9 @@ const EventDetails = () => {
   const eventOrganizerId = event?.organizer?._id?.toString();
   const isEventCreator = user?._id === eventOrganizerId;
 
+  const { dateOnly: startDateOnly, timeOnly: startTimeOnly } = formatDateTime(event?.startDateTime);
+  const { dateOnly: endDateOnly, timeOnly: endTimeOnly } = formatDateTime(event?.endDateTime);
+
 
   return (
     <>
@@ -106,7 +109,7 @@ const EventDetails = () => {
                 <img src={CalendarIcon} alt="calendar" width={32} height={32} />
                 <div className="p-medium-16 lg:p-regular-20 flex flex-wrap items-center">
                   <p>
-                    Start Date: {formatDateTime(event.startDateTime)}
+                    Start Date: {startDateOnly} - {startTimeOnly}
                   </p>
                 </div>
               </div>
@@ -115,7 +118,7 @@ const EventDetails = () => {
                 <img src={CalendarIcon} alt="calendar" width={32} height={32} />
                 <div className="p-medium-16 lg:p-regular-20 flex flex-wrap items-center">
                   <p>
-                    End Date: {formatDateTime(event.endDateTime)}
+                    End Date: {endDateOnly} - {endTimeOnly}
                   </p>
                 </div>
               </div>

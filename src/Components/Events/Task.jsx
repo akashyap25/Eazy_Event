@@ -113,7 +113,7 @@ const Task = () => {
           <span className="ml-2">Deadline Passed</span>
         </div>
       );
-    } else  {
+    } else {
       return (
         <div className="flex items-center text-yellow-500">
           <PendingActionsIcon />
@@ -153,9 +153,9 @@ const Task = () => {
                   error={touched.title && Boolean(errors.title)}
                   helperText={touched.title && errors.title}
                   sx={{
-                    borderRadius: "20px",
-                    backgroundColor: "#f1f5f9",
-                    "& .MuiInputBase-root": { borderRadius: "20px" },
+                    borderRadius: '20px',
+                    backgroundColor: '#f1f5f9',
+                    '& .MuiInputBase-root': { borderRadius: '20px' },
                   }}
                 />
                 <TextField
@@ -169,9 +169,9 @@ const Task = () => {
                   error={touched.description && Boolean(errors.description)}
                   helperText={touched.description && errors.description}
                   sx={{
-                    borderRadius: "20px",
-                    backgroundColor: "#f1f5f9",
-                    "& .MuiInputBase-root": { borderRadius: "20px" },
+                    borderRadius: '20px',
+                    backgroundColor: '#f1f5f9',
+                    '& .MuiInputBase-root': { borderRadius: '20px' },
                   }}
                 />
                 <FormControl fullWidth>
@@ -183,16 +183,16 @@ const Task = () => {
                     onChange={handleChange}
                     error={touched.assignee && Boolean(errors.assignee)}
                     sx={{
-                      borderRadius: "20px",
-                      backgroundColor: "#f1f5f9",
-                      "& .MuiInputBase-root": { borderRadius: "20px" },
+                      borderRadius: '20px',
+                      backgroundColor: '#f1f5f9',
+                      '& .MuiInputBase-root': { borderRadius: '20px' },
                     }}
                   >
-                    {users?.map(user => (
-                      <MenuItem 
-                        key={user._id} 
+                    {users?.map((user) => (
+                      <MenuItem
+                        key={user._id}
                         value={user._id}
-                        disabled={user._id === creatorId} 
+                        disabled={user._id === creatorId}
                       >
                         {user.firstName + ' ' + user.lastName + ' (' + user.email + ')'}
                       </MenuItem>
@@ -210,12 +210,15 @@ const Task = () => {
                   helperText={touched.deadline && errors.deadline}
                   InputLabelProps={{ shrink: true }}
                   sx={{
-                    borderRadius: "20px",
-                    backgroundColor: "#f1f5f9",
-                    "& .MuiInputBase-root": { borderRadius: "20px" },
+                    borderRadius: '20px',
+                    backgroundColor: '#f1f5f9',
+                    '& .MuiInputBase-root': { borderRadius: '20px' },
                   }}
                 />
-                <button type="submit" className="bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-40 text-sm sm:text-base flex items-center gap-2">
+                <button
+                  type="submit"
+                  className="bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-40 text-sm sm:text-base flex items-center gap-2"
+                >
                   <AddIcon />
                   Create Task
                 </button>
@@ -228,33 +231,39 @@ const Task = () => {
           <h4 className="h4-bold">Existing Tasks</h4>
           <div className="flex flex-col gap-4">
             {tasks?.length > 0 ? (
-              tasks.map((task) => (
-                <div
-                  key={task._id}
-                  className={`flex justify-between items-center p-4 border-l-4 rounded-lg ${getTaskBorderStyle(task)} shadow-md`}
-                >
-                  <div>
-                    <h5 className="h5-bold">{task.title}</h5>
-                    <p className="text-gray-600 mb-2">{task.description}</p>
-                    <p className="text-sm text-gray-500">Deadline: {formatDateTime(task.deadline)}</p>
-                    <p className='p-regular-18 text-gray-500'>Assigned to: {task.assignedTo.firstName + ' ' + task.assignedTo.lastName}</p>
+              tasks.map((task) => {
+                const { dateOnly, timeOnly } = formatDateTime(task.deadline);
+                return (
+                  <div
+                    key={task._id}
+                    className={`flex justify-between items-center p-4 border-l-4 rounded-lg ${getTaskBorderStyle(task)} shadow-md`}
+                  >
+                    <div>
+                      <h5 className="h5-bold">{task.title}</h5>
+                      <p className="text-gray-600 mb-2">{task.description}</p>
+                      <p className="text-sm text-gray-500">
+                        Deadline: {dateOnly} {timeOnly}
+                      </p>
+                      <p className="p-regular-18 text-gray-500">
+                        Assigned to: {task.assignedTo.firstName + ' ' + task.assignedTo.lastName}
+                      </p>
 
-                    {getTaskWarning(task)}
-
+                      {getTaskWarning(task)}
+                    </div>
+                    <div className="flex gap-2">
+                      <IconButton component={Link} to={`/tasks/${task._id}/update`} className="text-blue-600">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleDeleteTask(task._id)}
+                        className="text-red-600"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <IconButton component={Link} to={`/tasks/${task._id}/update`} className="text-blue-600">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleDeleteTask(task._id)}
-                      className="text-red-600"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-center p-regular-18 text-grey-600">No tasks available for this event.</p>
             )}
