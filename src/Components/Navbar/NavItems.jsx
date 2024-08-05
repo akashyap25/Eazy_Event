@@ -26,7 +26,8 @@ const NavItems = () => {
   const headerLinks = [
     { label: 'Home', route: '/' },
     { label: 'Create Event', route: '/events/create' },
-    { label: 'Profile', route: `/profile/${user._id}` }
+    { label: 'Profile', route: `/profile/${user._id}` },
+    {label: 'Tasks', route: `/tasks/${user._id}`},
   ];
 
   return (

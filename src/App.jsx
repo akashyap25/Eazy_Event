@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
 import './index.css';
-import { CreateEvent, Layout, Home, EventDetails, UpdateEvent, Profile } from './Components';
+import { CreateEvent, Layout, Home, EventDetails, UpdateEvent, Profile,Task,AssignedTask } from './Components';
 import Signin from './Components/auth/Sign-in';
 
 const PUBLISHABLE_KEY = 'pk_test_cHJvLXRyZWVmcm9nLTExLmNsZXJrLmFjY291bnRzLmRldiQ';
@@ -44,6 +44,14 @@ const appRouter = createBrowserRouter([
           {
             path: '/profile/:id',
             element: <Profile />
+          },
+          {
+            path: '/events/:id/tasks',
+            element: <Task />,
+          },
+          {
+            path: '/tasks/:id',
+            element: <AssignedTask />,
           }
         ],
       },

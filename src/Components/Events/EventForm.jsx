@@ -2,26 +2,16 @@ import React from 'react';
 import { useFormik } from 'formik';
 import {
   TextField,
-  Button,
   MenuItem,
   Checkbox,
   FormControlLabel,
   IconButton,
   InputAdornment,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { orange } from '@mui/material/colors';
 import locationicon from "../../assets/icons/location.svg";
 import UploadFileIcon from '../../assets/icons/file-upload.svg';
 import calendaricon from "../../assets/icons/calendar.svg";
 import dollar from "../../assets/icons/dollar.svg";
-
-const ColorButton = styled(Button)(() => ({
-  backgroundColor: '#705CF7',
-  '&:hover': {
-    backgroundColor: '#5c49D9',
-  },
-}));
 
 const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories, files, setFiles, imagePreview, setImagePreview }) => {
   const formik = useFormik({
@@ -29,7 +19,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
     validationSchema,
     onSubmit,
   });
-
+ 
   return (
     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-5">
       <div className="flex flex-col gap-5 md:flex-row">
@@ -124,15 +114,14 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
                   <p>SVG, PNG, JPG</p>
                 </div>
               </IconButton>
-              <ColorButton
-                variant="contained"
+              <button
                 onClick={() =>
                   document.querySelector('input[type="file"]').click()
                 }
-                sx={{ borderRadius: "20px", mt: 2 }}
+                className='bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-full sm:w-auto text-sm sm:text-base'
               >
                 Select Image
-              </ColorButton>
+              </button>
             </>
           )}
         </div>
@@ -323,15 +312,9 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
         />
       </div>
 
-      <ColorButton
+      <button
         type="submit"
-        fullWidth
-        variant="contained"
-        color="primary"
-        sx={{
-          borderRadius: "20px",
-          "& .MuiInputBase-root": { borderRadius: "20px" },
-        }}
+        className='bg-purple-600 hover:bg-purple-500 text-white rounded-full px-4 py-2 w-full sm:w-auto text-sm sm:text-base mt-8'
       >
         {formik.isSubmitting
           ? type === "update"
@@ -340,7 +323,7 @@ const EventForm = ({ initialValues,type, validationSchema, onSubmit, categories,
           : type === "update"
           ? "Update Event"
           : "Submit Event"}
-      </ColorButton>
+      </button>
     </form>
   );
 };
