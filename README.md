@@ -4,7 +4,6 @@
 
 Welcome to **Eazy Event**, a full-stack application built with React, Node.js, Express, and MySQL. This application allows users to register, login, create and manage events, and register for events. It also includes a task management system for events.
 
-![Project Logo](https://drive.google.com/file/d/1hq-BR692LiwHluBbYRdjL4rNSEGvA4kk/view?usp=sharing)
 
 ## Table of Contents
 
@@ -16,9 +15,6 @@ Welcome to **Eazy Event**, a full-stack application built with React, Node.js, E
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
 - [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
 
 ## Features
 
@@ -30,19 +26,19 @@ Welcome to **Eazy Event**, a full-stack application built with React, Node.js, E
 
 ## Tech Stack
 
-- **Frontend**: React, Axios, React Router, Tailwind CSS
+- **Frontend**: React, Axios, React Router, Tailwind CSS, Material UI, Formik
 - **Backend**: Node.js, Express.js
-- **Database**: MySQL
-- **Authentication**: JWT (JSON Web Tokens)
+- **Database**: MongoDB
+- **Authentication**: Clerk(User Management Platform)
 - **Environment Management**: dotenv
 
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
 
-- Node.js (v12.x or later)
+- Node.js (v16.x or later)
 - npm (v6.x or later) or yarn
-- MySQL (v5.7 or later)
+- MongoDB
 
 ## Installation
 
@@ -61,12 +57,21 @@ Before you begin, ensure you have met the following requirements:
 
     Create a `.env` file in the backend directory and add the following:
     ```env
-    PORT=3000
-    DB_HOST=your-db-host
-    DB_USER=your-db-username
-    DB_PASSWORD=your-db-password
-    DB_NAME=your-db-name
-    JWT_SECRET=your-jwt-secret
+    //MOngoDB
+    MONGO_URI=mongodb+srv://
+    //CLerk
+    CLERK_PUBLISHABLE_KEY=pk_test_
+    CLERK_SECRET_KEY=sk_test_
+    CLERK_WEBHOOK_SECRET_KEY=whsec_
+    //Port
+    SERVER_BASE_URL=http://localhost:5000
+    CLIENT_BASE_URL=http://localhost:5173
+    //Stripe
+    STRIPE_SECRET_KEY=
+    STRIPE_WEBHOOK_SECRET=
+    //NodeMailer
+    EMAIL_USER=
+    EMAIL_PASS=
     ```
 
     Run the backend server:
@@ -140,16 +145,7 @@ Before you begin, ensure you have met the following requirements:
 ### Task Management
 ![Task Management](https://drive.google.com/file/d/1kd4Dl66apz4vY1DU8xi4tcTfR3Iua7gR/view?usp=sharing)
 
-## Contributing
-
-Contributions are always welcome! Please fork this repository and open a pull request to add new features or bug fixes.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Contact
 
 Anurag kumar - [anuragkashyap026@gmail.com](mailto:anuragkashyap026@gmail.com)
 
-Project Link: [https://github.com/akashyap25/Eazy_Event.git](https://github.com/akashyap25/Eazy_Event.git)
