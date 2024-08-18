@@ -2,7 +2,7 @@
 
 ## Overview
 
-Welcome to **Eazy Event**, a full-stack application built with React, Node.js, Express, and MySQL. This application allows users to register, login, create and manage events, and register for events. It also includes a task management system for events.
+Welcome to **Eazy Event**, a full-stack application built with React, Node.js, Express, and MongoDB. This application allows users to register, login, create and manage events, and register for events. It also includes a task management system for events.
 
 
 ## Table of Contents
@@ -13,7 +13,6 @@ Welcome to **Eazy Event**, a full-stack application built with React, Node.js, E
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
-- [API Endpoints](#api-endpoints)
 - [Screenshots](#screenshots)
 
 ## Features
@@ -96,33 +95,6 @@ Before you begin, ensure you have met the following requirements:
     npm run start
     ```
 
-
-
-## API Endpoints
-
-- **User Authentication**
-    - `POST /register` - Register a new user
-    - `POST /login` - Login a user
-
-- **Events**
-    - `GET /events` - Get all events
-    - `POST /events` - Create a new event
-    - `GET /events/:id` - Get event by ID
-    - `PUT /events/:id` - Update event by ID
-    - `DELETE /events/:id` - Delete event by ID
-
-- **Categories**
-    - `GET /categories` - Get all categories
-    - `POST /categories` - Create a new category
-
-- **Event Registrations**
-    - `POST /eventRegistrations` - Register for an event
-
-- **Tasks**
-    - `GET /tasks` - Get all tasks
-    - `POST /tasks` - Create a new task
-    - `PUT /tasks/:id` - Update task by ID
-    - `DELETE /tasks/:id` - Delete task by ID
 
 ## Screenshots
 
