@@ -41,7 +41,7 @@ const EventFormSchema = Yup.object().shape({
   startDateTime: Yup.date().required('Start date and time is required'),
   endDateTime: Yup.date().required('End date and time is required'),
   price: Yup.number().required('Price is required'),
-  url: Yup.string().url('Invalid URL').required('URL is required'),
+  url: Yup.string().url('Invalid URL').nullable(),
   isFree: Yup.boolean(),
 });
 
@@ -61,11 +61,9 @@ const UpdateEvent = () => {
     const fetchCategories = async () => {
       try {
         const response = await apiService.get(`/api/categories`);
-        
-        // Categories API returns { success: true, categories: [...] }
-        const categoriesData = response.data?.categories || [];
-        
-        setCategories(categoriesData);
+        // apiService returns the response body directly: { success, categories }
+        const categoriesData = response?.categories ?? [];
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       } catch (error) {
         console.error('Error fetching categories:', error);
         setError('Failed to load categories');
@@ -102,8 +100,8 @@ const UpdateEvent = () => {
         setError(null);
         
         const response = await apiService.get(`/api/events/${id}`);
-        // Event API returns { success: true, data: {...} } or direct event object
-        const event = response.data?.success ? response.data.data : response.data;
+        // apiService returns response body: { success, data: event }
+        const event = response?.data ?? response;
 
         // Transform the category to its _id
         if (event.category && typeof event.category === 'object') {
@@ -146,7 +144,7 @@ const UpdateEvent = () => {
     try {
       setLoading(true);
       const response = await apiService.put(`/api/events/${id}`, values);
-      if (response.status === 200) {
+      if (response?.success !== false) {
         Swal.fire({
           title: 'Success!',
           text: 'Event updated successfully',
@@ -156,11 +154,11 @@ const UpdateEvent = () => {
           navigate(`/events/${id}`);
         });
       } else {
-        Swal.fire('Error', 'Event update failed', 'error');
+        Swal.fire('Error', response?.message || 'Event update failed', 'error');
       }
     } catch (error) {
       console.error('Error updating event:', error);
-      Swal.fire('Error', error.response?.data?.message || 'Failed to update event', 'error');
+      Swal.fire('Error', error?.message || error?.response?.data?.message || 'Failed to update event', 'error');
     } finally {
       setLoading(false);
     }

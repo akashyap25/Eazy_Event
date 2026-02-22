@@ -17,7 +17,8 @@ import {
   Laugh,
   Angry,
   Frown,
-  Star
+  Star,
+  AlertCircle
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { SERVER_URL } from '../../Utils/Constants';
@@ -44,7 +45,7 @@ const ChatRoom = ({ eventId, onClose }) => {
   
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
 
   const emojis = [
     { emoji: '❤️', name: 'heart' },
@@ -56,35 +57,52 @@ const ChatRoom = ({ eventId, onClose }) => {
     { emoji: '😡', name: 'angry' }
   ];
 
+  const socketRef = useRef(null);
+  const displayName = user ? [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.username || 'Guest' : 'Guest';
+
   useEffect(() => {
-    initializeSocket();
+    const token = (accessToken || localStorage.getItem('accessToken') || '').trim();
+    if (token) {
+      initializeSocket(token);
+    } else {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      setSocket(null);
+    }
     loadChatRooms();
-    
     return () => {
-      if (socket) {
-        socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
       }
     };
-  }, []);
+  }, [eventId, accessToken]);
+
+  useEffect(() => {
+    if (currentRoom && !currentRoom.isFallback) {
+      loadMessages();
+    }
+  }, [currentRoom?._id]);
 
   useEffect(() => {
     if (currentRoom && socket) {
-      loadMessages();
-      socket.emit('join_room', currentRoom._id);
+      socket.emit('join_room', { roomId: currentRoom._id, displayName });
     }
-  }, [currentRoom, socket]);
+  }, [currentRoom, socket, displayName]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const initializeSocket = () => {
-    const token = localStorage.getItem('accessToken');
-    
+  const initializeSocket = (token) => {
+    if (!token) return;
     const newSocket = io(SERVER_URL, {
-      auth: token ? { token } : {},
+      auth: { token: String(token) },
       transports: ['websocket', 'polling']
     });
+    socketRef.current = newSocket;
 
     newSocket.on('connect', () => {
       setIsConnected(true);
@@ -156,35 +174,57 @@ const ChatRoom = ({ eventId, onClose }) => {
   };
 
   const loadChatRooms = async () => {
+    const eventIdStr = typeof eventId === 'string' ? eventId : (eventId?.$oid ?? eventId?._id ?? eventId?.id ?? '');
+    const validEventId = /^[a-fA-F0-9]{24}$/.test(eventIdStr) ? eventIdStr : null;
+
+    function setFallbackRoom() {
+      const fallback = { _id: validEventId || eventIdStr || eventId, name: 'Event Chat', description: 'General discussion for this event', isFallback: true };
+      setChatRooms([fallback]);
+      setCurrentRoom(fallback);
+    }
+
+    if (!validEventId) {
+      setError('Invalid event ID');
+      setFallbackRoom();
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('accessToken');
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-      
-      const response = await fetch(`${SERVER_URL}/api/chat/events/${eventId}/rooms`, {
-        headers
-      });
+      const response = await fetch(`${SERVER_URL}/api/chat/events/${validEventId}/rooms`, { headers });
 
       if (response.ok) {
         const data = await response.json();
-        setChatRooms(data.data);
-        if (data.data.length > 0) {
-          setCurrentRoom(data.data[0]);
+        const rooms = data.data && Array.isArray(data.data) ? data.data : [];
+        if (rooms.length > 0) {
+          setChatRooms(rooms);
+          setCurrentRoom(rooms[0]);
+        } else if (token) {
+          const createRes = await fetch(`${SERVER_URL}/api/chat/events/${validEventId}/rooms`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const createData = await createRes.json().catch(() => ({}));
+          if (createRes.ok && createData.success && createData.data?._id) {
+            const room = createData.data;
+            setChatRooms([room]);
+            setCurrentRoom(room);
+          } else {
+            const msg = createData.message || (createData.errors?.length ? createData.errors.map(e => e.message).join(', ') : 'Failed to create or join chat room');
+            setError(msg);
+            setFallbackRoom();
+          }
+        } else {
+          setFallbackRoom();
         }
-      } else if (response.status === 401) {
-        // User not authenticated, create a default room for viewing
-        setChatRooms([{
-          _id: `event_${eventId}`,
-          name: 'Event Chat',
-          description: 'General discussion for this event'
-        }]);
-        setCurrentRoom({
-          _id: `event_${eventId}`,
-          name: 'Event Chat',
-          description: 'General discussion for this event'
-        });
+      } else {
+        setFallbackRoom();
       }
     } catch (error) {
       setError('Failed to load chat rooms');
+      setFallbackRoom();
     } finally {
       setLoading(false);
     }
@@ -192,18 +232,21 @@ const ChatRoom = ({ eventId, onClose }) => {
 
   const loadMessages = async () => {
     if (!currentRoom) return;
-
+    if (currentRoom.isFallback) {
+      setMessages([]);
+      return;
+    }
     try {
       const token = localStorage.getItem('accessToken');
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-      
       const response = await fetch(`${SERVER_URL}/api/chat/rooms/${currentRoom._id}/messages`, {
         headers
       });
 
       if (response.ok) {
         const data = await response.json();
-        setMessages(data.data);
+        const list = Array.isArray(data?.data) ? data.data : [];
+        setMessages(list);
       } else if (response.status === 401) {
         // User not authenticated, show sample messages for testing
         setMessages([
@@ -229,27 +272,26 @@ const ChatRoom = ({ eventId, onClose }) => {
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !currentRoom || !socket) return;
-
+    const activeSocket = socketRef.current || socket;
+    if (!newMessage.trim() || !currentRoom || !activeSocket) return;
     if (!user) {
       setError('Please log in to send messages');
       return;
     }
-
-
+    if (currentRoom.isFallback) {
+      setError('Chat room is not ready. Please refresh the page.');
+      return;
+    }
     try {
       const messageData = {
         roomId: currentRoom._id,
         content: newMessage.trim(),
         replyTo: replyTo?._id
       };
-
-      socket.emit('send_message', messageData);
+      activeSocket.emit('send_message', messageData);
       setNewMessage('');
       setReplyTo(null);
-      
-      // Stop typing indicator
-      socket.emit('typing_stop', { roomId: currentRoom._id });
+      socketRef.current?.emit('typing_stop', { roomId: currentRoom._id });
       setIsTyping(false);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -329,6 +371,25 @@ const ChatRoom = ({ eventId, onClose }) => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const getMessageSenderName = (message) => {
+    if (message.sender && (message.sender.firstName || message.sender.username)) {
+      return [message.sender.firstName, message.sender.lastName].filter(Boolean).join(' ').trim() || message.sender.username;
+    }
+    return message.senderGuestDisplayName || 'Guest';
+  };
+  const getMessageSenderRoleLabel = (message) => {
+    const r = message.senderEventRole;
+    if (r === 'owner') return 'Owner';
+    if (r === 'collaborator') return 'Collaborator';
+    if (r === 'attendee') return 'Attendee';
+    return null;
+  };
+  const isOwnMessage = (message) => message.sender?._id === user?._id;
+  const getMessageSenderInitial = (message) => {
+    if (message.sender) return message.sender.firstName?.[0] || message.sender.username?.[0] || 'U';
+    return (message.senderGuestDisplayName || 'G')[0];
   };
 
   const formatTime = (date) => {
@@ -420,6 +481,14 @@ const ChatRoom = ({ eventId, onClose }) => {
           </div>
         )}
 
+        {/* Error banner */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-4 flex items-center justify-between gap-2">
+            <p className="text-sm text-red-700">{error}</p>
+            <button type="button" onClick={() => setError(null)} className="text-red-500 hover:text-red-700 text-sm font-medium">Dismiss</button>
+          </div>
+        )}
+
         {/* Authentication Notice */}
         {!user && (
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-4">
@@ -452,22 +521,41 @@ const ChatRoom = ({ eventId, onClose }) => {
                     </div>
                   )}
                   
-                  <div className={`flex gap-3 ${message.sender._id === user?._id ? 'justify-end' : 'justify-start'}`}>
-                    {message.sender._id !== user?._id && (
+                  <div className={`flex gap-3 ${isOwnMessage(message) ? 'justify-end' : 'justify-start'}`}>
+                    {!isOwnMessage(message) && (
                       <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
-                        {message.sender.firstName?.[0] || message.sender.username?.[0] || 'U'}
+                        {getMessageSenderInitial(message)}
                       </div>
                     )}
                     
-                    <div className={`max-w-xs lg:max-w-md ${message.sender._id === user?._id ? 'order-first' : ''}`}>
-                      {message.sender._id !== user?._id && (
-                        <div className="text-sm font-medium text-gray-900 mb-1">
-                          {message.sender.firstName} {message.sender.lastName}
-                        </div>
-                      )}
+                    <div className={`max-w-xs lg:max-w-md ${isOwnMessage(message) ? 'order-first' : ''}`}>
+                      <div className={`text-sm font-medium mb-1 flex items-center gap-2 flex-wrap ${isOwnMessage(message) ? 'justify-end' : ''}`}>
+                        {!isOwnMessage(message) ? (
+                          <>
+                            <span className="text-gray-900">{getMessageSenderName(message)}</span>
+                            {getMessageSenderRoleLabel(message) && (
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                message.senderEventRole === 'owner' ? 'bg-amber-100 text-amber-800' :
+                                message.senderEventRole === 'collaborator' ? 'bg-indigo-100 text-indigo-800' :
+                                'bg-slate-100 text-slate-700'
+                              }`}>
+                                {getMessageSenderRoleLabel(message)}
+                              </span>
+                            )}
+                          </>
+                        ) : getMessageSenderRoleLabel(message) ? (
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            message.senderEventRole === 'owner' ? 'bg-amber-100 text-amber-800' :
+                            message.senderEventRole === 'collaborator' ? 'bg-indigo-100 text-indigo-800' :
+                            'bg-slate-100 text-slate-700'
+                          }`}>
+                            {getMessageSenderRoleLabel(message)}
+                          </span>
+                        ) : null}
+                      </div>
                       
                       <div className={`p-3 rounded-lg ${
-                        message.sender._id === user?._id
+                        isOwnMessage(message)
                           ? 'bg-blue-500 text-white'
                           : 'bg-gray-100 text-gray-900'
                       }`}>

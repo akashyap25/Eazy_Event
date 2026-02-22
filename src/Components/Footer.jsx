@@ -31,10 +31,10 @@ const Footer = () => {
       { label: 'Press', href: '/press' },
     ],
     support: [
-      { label: 'Help Center', href: '/help' },
-      { label: 'Contact Us', href: '/contact' },
-      { label: 'Status', href: '/status' },
-      { label: 'Community', href: '/community' },
+      { label: 'Help & Support', href: '/support' },
+      { label: 'Help Center', href: '/support' },
+      { label: 'Contact Us', href: '/support' },
+      { label: 'FAQs', href: '/support' },
     ],
     legal: [
       { label: 'Privacy Policy', href: '/privacy' },

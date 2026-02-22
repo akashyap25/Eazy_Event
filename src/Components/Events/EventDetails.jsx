@@ -47,6 +47,8 @@ import CalendarExport from './CalendarExport';
 import EventCollaboration from './EventCollaboration';
 import ChatRoom from './ChatRoom';
 import SocialShare from './SocialShare';
+import EventChatbot from '../ai/EventChatbot';
+import EventReviews from './EventReviews';
 
 const EventDetails = () => {
   const { id } = useParams();
@@ -213,8 +215,9 @@ const EventDetails = () => {
     );
   }
 
-  const eventOrganizerId = event?.organizer?._id?.toString();
-  const isEventCreator = user?._id === eventOrganizerId;
+  const eventOrganizerId = (event?.organizer?._id ?? event?.organizer)?.toString?.();
+  const currentUserId = (currentUser?._id ?? user?._id)?.toString?.();
+  const isEventCreator = Boolean(eventOrganizerId && currentUserId && eventOrganizerId === currentUserId);
   const eventStatus = getEventStatus();
   const StatusIcon = eventStatus.icon;
 
@@ -404,6 +407,9 @@ const EventDetails = () => {
                 )}
               </div>
             </Card>
+
+            {/* Event Reviews Section */}
+            <EventReviews eventId={event._id} isOrganizer={isEventCreator} />
           </div>
 
           {/* Sidebar */}
@@ -415,7 +421,7 @@ const EventDetails = () => {
                   {event.isFree ? 'FREE' : `₹${Number(event.price)}`}
                 </div>
                 
-                <CheckoutButton event={event} />
+                <CheckoutButton event={event} isEventCreator={isEventCreator} />
                 
                 {isEventCreator && (
                   <div className="space-y-2">
@@ -497,18 +503,20 @@ const EventDetails = () => {
 
             {/* Event Stats */}
             <Card>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Event Statistics</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Event Statistics</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Attendees</span>
-                  <span className="font-medium">{event.attendees?.length || 0}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Registered</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {typeof event.registeredCount === 'number' ? event.registeredCount : (event.attendees?.length || 0)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Capacity</span>
-                  <span className="font-medium">{event.capacity}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Capacity</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{event.capacity}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status</span>
+                  <span className="text-gray-600 dark:text-gray-400">Status</span>
                   <span className={`font-medium text-${eventStatus.color}-600`}>
                     {eventStatus.status}
                   </span>
@@ -664,6 +672,9 @@ const EventDetails = () => {
           onClose={() => setShowSocialShare(false)} 
         />
       )}
+
+      {/* AI Event Chatbot - floating button */}
+      <EventChatbot eventId={event._id} eventTitle={event.title} />
     </div>
   );
 };

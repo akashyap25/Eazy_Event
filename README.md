@@ -16,6 +16,8 @@ Welcome to **Eazy Event**, a full-stack event management application built with 
 - **Responsive Design** - Mobile-first, responsive UI
 
 ### Advanced Features
+- **Event Chat** - Real-time event chat (owner, collaborators, and registered attendees); role badges (Owner / Collaborator / Attendee); message history persisted
+- **Create Event Wizard** - 5-step flow: Basic Information → Event Details → Pricing & Media → Advanced Settings → Review & Publish
 - **Image Upload** - Cloudinary integration for event images
 - **Search & Filtering** - Advanced event search and filtering
 - **Category Management** - Organize events by categories
@@ -34,7 +36,7 @@ Welcome to **Eazy Event**, a full-stack event management application built with 
 - **React Router** - Client-side routing
 - **Formik + Yup** - Form handling and validation
 - **Axios** - HTTP client
-- **Clerk** - Authentication service
+- **Socket.IO Client** - Real-time chat
 - **Stripe** - Payment processing
 
 ### Backend
@@ -75,68 +77,21 @@ cd Eazy_Event
 
 ### 2. Backend Setup
 
-Navigate to the backend directory:
+The backend runs in a **separate repository**. Clone and run it first:
+
 ```bash
+git clone https://github.com/akashyap25/eazy_event_server.git
 cd eazy_event_server
-```
-
-Install dependencies:
-```bash
 npm install
-```
-
-Create environment file:
-```bash
 cp .env.example .env
+# Edit .env (MONGO_URI, JWT_SECRET, etc.)
+npm start
 ```
 
-Configure your `.env` file:
-```env
-# Database
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
-
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-SERVER_BASE_URL=http://localhost:5000
-CLIENT_BASE_URL=http://localhost:5173
-
-# Clerk Authentication
-CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
-CLERK_SECRET_KEY=sk_test_your_secret_key_here
-CLERK_WEBHOOK_SECRET_KEY=whsec_your_webhook_secret_here
-
-# Stripe Payment
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
-STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret_here
-
-# Email Configuration
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password_here
-
-# Cloudinary (for image uploads)
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-CLOUDINARY_UPLOAD_PRESET=your_upload_preset
-
-# Security
-JWT_SECRET=your_jwt_secret_here
-BCRYPT_ROUNDS=12
-```
-
-Start the backend server:
-```bash
-npm run dev
-```
+See [eazy_event_server](https://github.com/akashyap25/eazy_event_server) for full backend setup and environment variables.
 
 ### 3. Frontend Setup
 
-Navigate to the frontend directory:
-```bash
-cd Eazy_Event
-```
-
 Install dependencies:
 ```bash
 npm install
@@ -149,9 +104,7 @@ cp .env.example .env
 
 Configure your `.env` file:
 ```env
-# Frontend Environment Variables
 VITE_SERVER_URL=http://localhost:5000
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
 VITE_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
@@ -164,16 +117,7 @@ npm run dev
 
 ## 🧪 Testing
 
-Run tests for the backend:
-```bash
-cd eazy_event_server
-npm test
-```
-
-Run tests with coverage:
-```bash
-npm run test:coverage
-```
+Backend tests are in the [eazy_event_server](https://github.com/akashyap25/eazy_event_server) repo (`npm test` there).
 
 ## 📚 API Documentation
 

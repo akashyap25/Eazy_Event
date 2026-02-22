@@ -39,7 +39,7 @@ const Card = ({
   const cursorClass = onClick ? 'cursor-pointer' : '';
 
   const classes = `
-    bg-white border border-gray-200
+    bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
     ${paddingClasses[padding]}
     ${shadowClasses[shadow]}
     ${roundedClasses[rounded]}
@@ -63,19 +63,19 @@ const Card = ({
 
 // Card sub-components
 const CardHeader = ({ children, className = '', ...props }) => (
-  <div className={`border-b border-gray-200 pb-4 mb-4 ${className}`} {...props}>
+  <div className={`border-b border-gray-200 dark:border-gray-700 pb-4 mb-4 ${className}`} {...props}>
     {children}
   </div>
 );
 
 const CardTitle = ({ children, className = '', ...props }) => (
-  <h3 className={`text-lg font-semibold text-gray-900 ${className}`} {...props}>
+  <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${className}`} {...props}>
     {children}
   </h3>
 );
 
 const CardDescription = ({ children, className = '', ...props }) => (
-  <p className={`text-sm text-gray-600 ${className}`} {...props}>
+  <p className={`text-sm text-gray-600 dark:text-gray-400 ${className}`} {...props}>
     {children}
   </p>
 );
@@ -87,7 +87,7 @@ const CardContent = ({ children, className = '', ...props }) => (
 );
 
 const CardFooter = ({ children, className = '', ...props }) => (
-  <div className={`border-t border-gray-200 pt-4 mt-4 ${className}`} {...props}>
+  <div className={`border-t border-gray-200 dark:border-gray-700 pt-4 mt-4 ${className}`} {...props}>
     {children}
   </div>
 );

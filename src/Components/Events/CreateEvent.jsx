@@ -38,6 +38,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import RecurringEventForm from './RecurringEventForm';
+import DescriptionGenerator from '../ai/DescriptionGenerator';
 
 // Step definitions for the wizard
 const STEPS = [
@@ -98,6 +99,7 @@ const stepValidationSchemas = [
       otherwise: (schema) => schema.notRequired()
     }),
     isFree: Yup.boolean(),
+    imageUrl: Yup.string().required('Event image is required').min(1, 'Please upload an event image'),
     url: Yup.string().url('Please enter a valid URL').nullable(),
   }),
   Yup.object().shape({
@@ -156,9 +158,9 @@ const CreateEvent = () => {
         setLoading(true);
         
         
-        // Fetch categories
+        // Fetch categories - API returns { success, categories }
         const categoriesResponse = await apiService.get(`/api/categories`);
-        setCategories(categoriesResponse.data?.categories || []);
+        setCategories(categoriesResponse?.categories || []);
         
         // Fetch user data
         if (currentUser?._id) {
@@ -348,22 +350,23 @@ const CreateEvent = () => {
       
         const response = await apiService.post(`/api/events/create`, submitData);
       
-      if (response.data.success) {
+      // apiService returns the response body directly (e.g. { success, eventId })
+      if (response?.success && response?.eventId) {
         Swal.fire({
           title: 'Success!',
           text: 'Event created successfully!',
           icon: 'success',
           confirmButtonText: 'View Event'
         }).then(() => {
-          navigate(`/events/${response.data.eventId}`);
+          navigate(`/events/${response.eventId}`);
         });
       } else {
-        Swal.fire('Error', 'Failed to create event', 'error');
+        Swal.fire('Error', response?.message || 'Failed to create event', 'error');
       }
     } catch (error) {
       console.error('Error creating event:', error);
-      console.error('Error response:', error.response?.data);
-      Swal.fire('Error', error.response?.data?.message || 'Failed to create event', 'error');
+      const message = error?.response?.data?.message || error?.message || 'Failed to create event';
+      Swal.fire('Error', message, 'error');
     } finally {
       setLoading(false);
     }
@@ -404,25 +407,25 @@ const CreateEvent = () => {
           <p className="text-gray-600">Follow the steps below to create an amazing event</p>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress Bar - items-start keeps all steps aligned to top */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-2">
             {STEPS.map((step, index) => {
               const isActive = currentStep === step.id;
               const isCompleted = currentStep > step.id;
               const StepIcon = step.icon;
               
               return (
-                <div key={step.id} className="flex flex-col items-center">
+                <div key={step.id} className="flex flex-col items-center flex-1 min-w-0">
                   <div className={`
-                    w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-200
+                    w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-200 flex-shrink-0
                     ${isCompleted ? 'bg-green-500 text-white' : 
                       isActive ? 'bg-blue-500 text-white' : 
                       'bg-gray-200 text-gray-500'}
                   `}>
                     {isCompleted ? <CheckCircle className="w-6 h-6" /> : <StepIcon className="w-6 h-6" />}
                   </div>
-                  <div className="text-center">
+                  <div className="text-center min-h-[2.5rem]">
                     <p className={`text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>
                       {step.title}
                     </p>
@@ -430,11 +433,9 @@ const CreateEvent = () => {
                       {step.description}
                     </p>
                   </div>
-                  {index < STEPS.length - 1 && (
-                    <div className={`hidden sm:block w-16 h-0.5 mt-6 ${
-                      isCompleted ? 'bg-green-500' : 'bg-gray-200'
-                    }`} />
-                  )}
+                  <div className={`hidden sm:block w-full max-w-4 h-0.5 mt-4 flex-shrink-0 ${
+                    isCompleted ? 'bg-green-500' : 'bg-gray-200'
+                  }`} />
                 </div>
               );
             })}
@@ -551,7 +552,7 @@ const CreateEvent = () => {
             </Button>
             
             <div className="flex gap-3">
-              {currentStep < STEPS.length - 1 ? (
+              {currentStep < STEPS.length ? (
                 <Button
                   onClick={handleNext}
                   icon={ArrowRight}
@@ -605,8 +606,8 @@ const BasicInfoStep = ({ formData, errors, categories, onInputChange }) => {
           <select
             value={formData.category}
             onChange={(e) => onInputChange('category', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              errors.category ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+              errors.category ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
           >
             <option value="">Select a category</option>
@@ -622,14 +623,24 @@ const BasicInfoStep = ({ formData, errors, categories, onInputChange }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Description <span className="text-red-500">*</span>
+            </label>
+            <DescriptionGenerator
+              eventDetails={{
+                title: formData.title,
+                category: formData.category,
+                location: formData.location
+              }}
+              onGenerated={(text) => onInputChange('description', text)}
+            />
+          </div>
           <textarea
             value={formData.description}
             onChange={(e) => onInputChange('description', e.target.value)}
             rows={6}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
               errors.description ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Describe your event in detail. What will attendees learn or experience?"
@@ -792,15 +803,17 @@ const PricingMediaStep = ({ formData, errors, imagePreview, uploadingImage, onIn
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Event Image
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Event Image <span className="text-red-500">*</span>
           </label>
           <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-            uploadingImage 
-              ? 'border-blue-300 bg-blue-50' 
-              : imagePreview 
-                ? 'border-green-300 bg-green-50' 
-                : 'border-gray-300 hover:border-gray-400'
+            errors.imageUrl
+              ? 'border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10'
+              : uploadingImage 
+                ? 'border-blue-300 bg-blue-50 dark:bg-blue-900/20' 
+                : imagePreview 
+                  ? 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20' 
+                  : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
           }`}>
             {uploadingImage ? (
               <div className="space-y-3">
@@ -884,8 +897,11 @@ const PricingMediaStep = ({ formData, errors, imagePreview, uploadingImage, onIn
               </div>
             )}
           </div>
-          <div className="mt-2 text-sm text-gray-500 space-y-1">
-            <p>• Recommended size: 1200x630px</p>
+          {errors.imageUrl && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.imageUrl}</p>
+          )}
+          <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 space-y-1">
+            <p>• Required — recommended size: 1200x630px</p>
             <p>• Max file size: 5MB</p>
             <p>• Supported formats: JPG, PNG, GIF, WebP</p>
           </div>
@@ -965,124 +981,105 @@ const AdditionalSettingsStep = ({ formData, errors, onInputChange, onAddTag, onR
   );
 };
 
-// Step 5: Review & Publish
+// Step 5: Review & Publish - matches the flow of other steps
 const ReviewStep = ({ formData, categories, user }) => {
   const selectedCategory = categories.find(cat => cat._id === formData.category);
+
+  const reviewSections = [
+    {
+      title: 'Basic Information',
+      icon: Info,
+      items: [
+        { label: 'Title', value: formData.title },
+        { label: 'Category', value: selectedCategory?.name || 'Not selected' },
+        { label: 'Description', value: formData.description, multiline: true }
+      ]
+    },
+    {
+      title: 'Event Details',
+      icon: Calendar,
+      items: [
+        { label: 'Start', value: formData.startDateTime ? new Date(formData.startDateTime).toLocaleString() : 'Not set' },
+        { label: 'End', value: formData.endDateTime ? new Date(formData.endDateTime).toLocaleString() : 'Not set' },
+        { label: 'Location', value: formData.location },
+        { label: 'Capacity', value: `${formData.capacity} attendees` }
+      ]
+    },
+    {
+      title: 'Pricing & Media',
+      icon: DollarSign,
+      items: [
+        { label: 'Price', value: formData.isFree ? 'Free' : `$${formData.price}` },
+        ...(formData.url ? [{ label: 'Website', value: formData.url, link: true }] : []),
+        ...(formData.imageUrl ? [{ label: 'Image', value: formData.imageUrl, image: true }] : [])
+      ]
+    },
+    {
+      title: 'Tags & Organizer',
+      icon: Tag,
+      items: [
+        { label: 'Organizer', value: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() },
+        { label: 'Tags', value: formData.tags?.join(', ') || 'None', tags: formData.tags }
+      ]
+    }
+  ];
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <Eye className="w-12 h-12 text-blue-500 mx-auto mb-3" />
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Review Your Event</h2>
-        <p className="text-gray-600">Please review all details before publishing</p>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Review Your Event</h2>
+        <p className="text-gray-600 dark:text-gray-400">Please review all details before publishing</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Event Information</h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Title</p>
-                <p className="text-gray-900">{formData.title}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Category</p>
-                <p className="text-gray-900">{selectedCategory?.name || 'Not selected'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Description</p>
-                <p className="text-gray-900 text-sm">{formData.description}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Event Details</h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Start Date & Time</p>
-                <p className="text-gray-900">
-                  {formData.startDateTime ? new Date(formData.startDateTime).toLocaleString() : 'Not set'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">End Date & Time</p>
-                <p className="text-gray-900">
-                  {formData.endDateTime ? new Date(formData.endDateTime).toLocaleString() : 'Not set'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Location</p>
-                <p className="text-gray-900">{formData.location}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Capacity</p>
-                <p className="text-gray-900">{formData.capacity} attendees</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing & Media</h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Price</p>
-                <p className="text-gray-900">
-                  {formData.isFree ? 'Free' : `$${formData.price}`}
-                </p>
-              </div>
-              {formData.url && (
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Website</p>
-                  <a
-                    href={formData.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    {formData.url}
-                  </a>
-                </div>
-              )}
-              {formData.imageUrl && (
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Image</p>
-                  <img
-                    src={formData.imageUrl}
-                    alt="Event preview"
-                    className="w-full h-32 object-cover rounded-lg mt-2"
-                  />
-                </div>
-              )}
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Info</h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Organizer</p>
-                <p className="text-gray-900">{user?.firstName} {user?.lastName}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Tags</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {formData.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+      <div className="space-y-6 max-w-2xl mx-auto">
+        {reviewSections.map((section) => {
+          const SectionIcon = section.icon;
+          return (
+            <div
+              key={section.title}
+              className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
+            >
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <SectionIcon className="w-5 h-5 text-blue-500" />
+                {section.title}
+              </h3>
+              <div className="space-y-3">
+                {section.items.map((item, idx) => (
+                  <div key={idx} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 sm:w-28 flex-shrink-0">
+                      {item.label}
+                    </p>
+                    <div className="flex-1 min-w-0">
+                      {item.multiline ? (
+                        <p className="text-gray-900 dark:text-white text-sm whitespace-pre-wrap">{item.value}</p>
+                      ) : item.tags ? (
+                        <div className="flex flex-wrap gap-1">
+                          {item.tags.map((tag, i) => (
+                            <span
+                              key={i}
+                              className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      ) : item.image ? (
+                        <img src={item.value} alt="Event" className="h-24 object-cover rounded-lg" />
+                      ) : item.link ? (
+                        <a href={item.value} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline text-sm truncate block">
+                          {item.value}
+                        </a>
+                      ) : (
+                        <p className="text-gray-900 dark:text-white text-sm">{item.value}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </Card>
-        </div>
+          );
+        })}
       </div>
     </div>
   );

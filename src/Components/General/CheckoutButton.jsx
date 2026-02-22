@@ -9,7 +9,7 @@ import apiService from '../../utils/apiService';
 import { generateTicketPDF } from '../../utils/generatePDF';
 import { Ticket, Download, Eye } from 'lucide-react';
 
-const CheckoutButton = ({ event }) => {
+const CheckoutButton = ({ event, isEventCreator = false }) => {
   const { user: currentUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -20,6 +20,10 @@ const CheckoutButton = ({ event }) => {
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const hasEventFinished = new Date(event.endDateTime) < new Date();
+
+  // Event creator cannot register for their own event
+  const organizerId = event?.organizer?._id?.toString?.() || event?.organizer?.toString?.();
+  const isOrganizer = isEventCreator || (currentUser?._id && organizerId && currentUser._id.toString() === organizerId);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -38,33 +42,20 @@ const CheckoutButton = ({ event }) => {
     fetchUser();
   }, [currentUser?._id, event._id]);
 
-  useEffect(() => {
-    console.log('showTicket state changed:', showTicket);
-  }, [showTicket]);
-
   const checkRegistrationStatus = async () => {
     try {
       if (!currentUser?._id) return;
       setLoading(true);
-      
-      // Check if user has orders for this event
       const response = await apiService.get(`/api/orders/user/${currentUser._id}`);
-      const userOrders = response.data || [];
-      
-      console.log('Checking registration for event:', event._id);
-      console.log('User orders:', userOrders);
-      
-      const eventOrder = userOrders.find(order => 
-        order.event === event._id || 
-        (order.event && order.event._id === event._id) ||
+      const userOrders = Array.isArray(response?.data) ? response.data : (response ? [response] : []);
+      const eventOrder = userOrders.find(order =>
+        order.event === event._id ||
         (order.event && order.event._id === event._id)
       );
       if (eventOrder) {
-        console.log('Found registration:', eventOrder);
         setIsRegistered(true);
         setTicketData(eventOrder);
       } else {
-        console.log('No registration found');
         setIsRegistered(false);
         setTicketData(null);
       }
@@ -83,7 +74,6 @@ const CheckoutButton = ({ event }) => {
   };
 
   const handleCheckoutSuccess = (ticket) => {
-    console.log('Checkout success, ticket data:', ticket);
     setTicketData(ticket);
     setIsRegistered(true);
     setShowCheckout(false);
@@ -97,7 +87,6 @@ const CheckoutButton = ({ event }) => {
   };
 
   const handleViewTicketFromModal = (ticket) => {
-    console.log('View ticket from modal, ticket:', ticket);
     setTicketData(ticket);
     setShowTicket(true);
   };
@@ -117,28 +106,23 @@ const CheckoutButton = ({ event }) => {
   };
 
   const handleViewTicket = () => {
-    console.log('View ticket clicked, ticketData:', ticketData);
-    console.log('Current showTicket state:', showTicket);
-    if (!ticketData) {
-      console.log('No ticket data available');
-      return;
-    }
-    console.log('Setting showTicket to true');
+    if (!ticketData) return;
     setShowTicket(true);
-    
-    // Test if the modal should be visible
-    setTimeout(() => {
-      console.log('After timeout, showTicket state:', showTicket);
-    }, 100);
-    
-    // Simple test - show alert first
-    alert('View ticket clicked! Check console for modal state.');
   };
 
   if (hasEventFinished) {
     return (
       <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
         <p className="text-red-600 font-medium">Sorry, tickets are no longer available.</p>
+      </div>
+    );
+  }
+
+  if (isOrganizer) {
+    return (
+      <div className="p-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+        <p className="text-gray-700 dark:text-gray-300 font-medium">You are the organizer</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Registration is for attendees only.</p>
       </div>
     );
   }

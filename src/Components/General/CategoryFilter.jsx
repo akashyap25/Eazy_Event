@@ -95,15 +95,15 @@ const CategoryFilter = () => {
           />
           
           {/* Dropdown */}
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
             {categories.map((category) => (
               <button
                 key={category._id}
                 onClick={() => handleCategoryChange(category)}
-                className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
+                className={`w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
                   currentCategory?._id === category._id 
-                    ? 'bg-blue-50 text-blue-600 font-medium' 
-                    : 'text-gray-700'
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' 
+                    : 'text-gray-700 dark:text-gray-300'
                 }`}
               >
                 {category.name}

@@ -15,11 +15,15 @@ import {
   Signin,
   RegisterForm
 } from './components/LazyComponents';
+import OAuthCallback from './Pages/OAuthCallback';
+import Support from './Pages/Support';
 import Layout from './Components/Layout';
 import ErrorBoundary from './Components/ErrorBoundary';
 import ScrollToTop from './Components/ScrollToTop';
 import LoadingSpinner from './Components/LoadingSpinner';
+import ProtectedRoute from './Components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const appRouter = createBrowserRouter([
   {
@@ -35,6 +39,10 @@ const appRouter = createBrowserRouter([
         element: <RegisterForm />,
       },
       {
+        path: '/oauth/callback',
+        element: <OAuthCallback />,
+      },
+      {
         path: '/',
         element: <Outlet />,
         children: [
@@ -44,19 +52,19 @@ const appRouter = createBrowserRouter([
           },
           {
             path: '/events/create',
-            element: <CreateEvent />
+            element: <ProtectedRoute><CreateEvent /></ProtectedRoute>
           },
           {
             path: '/events/my',
-            element: <MyEvents />
+            element: <ProtectedRoute><MyEvents /></ProtectedRoute>
           },
           {
             path: '/tasks',
-            element: <AllTasks />
+            element: <ProtectedRoute><AllTasks /></ProtectedRoute>
           },
           {
             path: '/settings',
-            element: <Settings />
+            element: <ProtectedRoute><Settings /></ProtectedRoute>
           },
           {
             path: '/events/:id',
@@ -64,19 +72,23 @@ const appRouter = createBrowserRouter([
           },
           {
             path: '/events/:id/update',
-            element: <UpdateEvent />
+            element: <ProtectedRoute><UpdateEvent /></ProtectedRoute>
           },
           {
             path: '/profile/:id',
-            element: <Profile />
+            element: <ProtectedRoute><Profile /></ProtectedRoute>
           },
           {
             path: '/events/:id/tasks',
-            element: <Task />,
+            element: <ProtectedRoute><Task /></ProtectedRoute>,
           },
           {
             path: '/tasks/:id',
-            element: <AssignedTask />,
+            element: <ProtectedRoute><AssignedTask /></ProtectedRoute>,
+          },
+          {
+            path: '/support',
+            element: <Support />
           }
         ],
       },
@@ -92,9 +104,11 @@ const appRouter = createBrowserRouter([
 const App = () => {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <RouterProvider router={appRouter} />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <RouterProvider router={appRouter} />
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 };
